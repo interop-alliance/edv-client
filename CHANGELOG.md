@@ -1,6 +1,6 @@
 # @digitalbazaar/edv-client ChangeLog
 
-## 16.2.0 - 2025-mm-dd
+## 16.2.0 - 2025-09-11
 
 ### Changed
 - Update dependencies:
