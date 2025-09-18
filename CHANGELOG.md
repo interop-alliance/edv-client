@@ -1,6 +1,6 @@
 # @digitalbazaar/edv-client ChangeLog
 
-## 16.3.0 - 2025-mm-dd
+## 16.3.0 - 2025-09-17
 
 ### Changed
 - Add `returnDocuments` query option for `/documents/query`. This option
