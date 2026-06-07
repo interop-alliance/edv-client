@@ -3,6 +3,7 @@
  */
 import { assert, assertInvocationSigner } from './assert.js'
 import { DEFAULT_HEADERS } from '@interop/http-client'
+import type { ISigner } from '@interop/data-integrity-core'
 import { EdvClientCore } from './EdvClientCore.js'
 import { HttpsTransport } from './HttpsTransport.js'
 
@@ -19,7 +20,7 @@ import { HttpsTransport } from './HttpsTransport.js'
 
 export class EdvClient extends EdvClientCore {
   capability: any
-  invocationSigner: any
+  invocationSigner?: ISigner
   httpsAgent: any
   defaultHeaders: any
 

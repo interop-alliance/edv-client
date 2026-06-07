@@ -8,7 +8,13 @@ import {
   assertDocument,
   assertTransport
 } from './assert.js'
-import { Cipher } from '@digitalbazaar/minimal-cipher'
+import { Cipher } from '@interop/minimal-cipher'
+import type {
+  IHMAC,
+  IKeyAgreementKey,
+  IKeyResolver,
+  IRecipient
+} from '@interop/data-integrity-core'
 import { getRandomBytes } from './util.js'
 import { IndexHelper } from './IndexHelper.js'
 import { LegacyIndexHelperVersion1 } from './LegacyIndexHelperVersion1.js'
@@ -17,11 +23,11 @@ import { LegacyIndexHelperVersion1 } from './LegacyIndexHelperVersion1.js'
 const DEFAULT_CHUNK_SIZE = 1048576
 
 export class EdvClientCore {
-  hmac: any
-  id: any
-  keyAgreementKey: any
-  keyResolver: any
-  cipher: any
+  hmac?: IHMAC
+  id?: string
+  keyAgreementKey?: IKeyAgreementKey
+  keyResolver?: IKeyResolver
+  cipher: Cipher
   indexHelper: any
 
   /**
@@ -613,7 +619,7 @@ export class EdvClientCore {
   }
 
   // helper to create default recipients
-  _createDefaultRecipients(keyAgreementKey: any) {
+  _createDefaultRecipients(keyAgreementKey: IKeyAgreementKey): IRecipient[] {
     return keyAgreementKey
       ? [
           {
@@ -637,7 +643,7 @@ export class EdvClientCore {
     // decrypt doc content
     const { cipher } = this
     const { jwe } = encryptedDoc
-    const data = await cipher.decryptObject({ jwe, keyAgreementKey })
+    const data: any = await cipher.decryptObject({ jwe, keyAgreementKey })
     if (data === null) {
       throw new Error('Decryption failed.')
     }

@@ -6,4 +6,3 @@
 // public API of `edv-client` is typed in its own source.
 declare module 'canonicalize'
 declare module 'split-string'
-declare module '@digitalbazaar/minimal-cipher'
