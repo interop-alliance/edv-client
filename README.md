@@ -19,15 +19,15 @@ with remote Encrypted Data Vault (EDV) servers.
 
 It consists of one main class:
 
-* **`EdvClient`** - instances provide a CRUD (+ find) interface to a specific
-  configured Encrypted Data Vault server and ensure appropriate database
-  indexes are set up. Static methods allow for the creation of EDVs with a
-  remote storage service, e.g.
-  Encrypted Data Vault storage servers.
+- **`EdvClient`** - instances provide a CRUD (+ find) interface to a specific
+  configured Encrypted Data Vault server and ensure appropriate database indexes
+  are set up. Static methods allow for the creation of EDVs with a remote
+  storage service, e.g. Encrypted Data Vault storage servers.
 
 #### Encrypted Data Vault storage servers:
-* MongoDB-based - https://github.com/digitalbazaar/bedrock-edv-storage
-* PouchDB-based - https://github.com/digitalbazaar/bedrock-web-pouch-edv
+
+- MongoDB-based - https://github.com/digitalbazaar/bedrock-edv-storage
+- PouchDB-based - https://github.com/digitalbazaar/bedrock-web-pouch-edv
 
 ## Install
 
@@ -56,29 +56,30 @@ npm install
 First, create a key agreement key and an HMAC (hash-based message authentication
 code) key for encrypting your documents and blinding any indexed attributes in
 them. This requires creating some cryptographic key material which can be done
-locally or via a KMS system. The current example shows using a KMS system
-(TODO: show a simpler local example):
+locally or via a KMS system. The current example shows using a KMS system (TODO:
+show a simpler local example):
 
 ```js
-import {CapabilityAgent, KeystoreAgent, KmsClient} from 'webkms-client';
-import {EdvClient} from 'edv-client';
+import { CapabilityAgent, KeystoreAgent, KmsClient } from 'webkms-client'
+import { EdvClient } from 'edv-client'
 ```
+
 Although Encrypted Data Vaults are not bound to any particular key management
 system, we recommend that you set up a Key Management Service using an
 implementation such as
-[`webkms-switch`](https://github.com/digitalbazaar/webkms-switch)
-which you can connect to using
+[`webkms-switch`](https://github.com/digitalbazaar/webkms-switch) which you can
+connect to using
 [`webkms-client`](https://github.com/digitalbazaar/webkms-client).
 
 Optional:
 
 ```js
 // create a CapabilityAgent (for invoking zcaps)
-const capabilityAgent = await CapabilityAgent.fromSecret({secret, handle});
+const capabilityAgent = await CapabilityAgent.fromSecret({ secret, handle })
 
 // create a keystore and an agent for working with it
 // the baseUrl can be set to a dev API or production API
-const kmsBaseUrl = `${config.server.baseUri}/kms`;
+const kmsBaseUrl = `${config.server.baseUri}/kms`
 const keystore = KmsClient.createKeystore({
   // the url for the keystore is configurable
   url: `${kmsBaseUrl}/keystores`,
@@ -96,21 +97,23 @@ const keystore = KmsClient.createKeystore({
    * for back-end use cases a nodejs `https.Agent`
    * may be used to allow the use of self signed certificates using
    * the `rejectUnauthorized: false` flag in the contructor.
-  */
+   */
   httpsAgent
-});
-const keystoreAgent = new KeystoreAgent({keystore, capabilityAgent});
+})
+const keystoreAgent = new KeystoreAgent({ keystore, capabilityAgent })
 
 // use the keystore agent to create key agreement and HMAC keys
-const keyAgreementKey = await keystoreAgent.generateKey({type: 'keyAgreement'});
-const hmac = await keystoreAgent.generateKey({type: 'hmac'});
+const keyAgreementKey = await keystoreAgent.generateKey({
+  type: 'keyAgreement'
+})
+const hmac = await keystoreAgent.generateKey({ type: 'hmac' })
 ```
 
 Now you can create and register a new EDV configuration:
 
 ```js
 // TODO: explain EDV service must be able to authenticate user
-const controller = 'account id goes here';
+const controller = 'account id goes here'
 
 const config = {
   // on init the sequence must be 0 and is required
@@ -118,25 +121,29 @@ const config = {
   controller,
   // TODO: Explain what 'referenceId' is
   referenceId: 'primary',
-  keyAgreementKey: {id: keyAgreementKey.id, type: keyAgreementKey.type},
-  hmac: {id: hmac.id, type: hmac.type}
-};
+  keyAgreementKey: { id: keyAgreementKey.id, type: keyAgreementKey.type },
+  hmac: { id: hmac.id, type: hmac.type }
+}
 
 // sends a POST request to the remote service to create an EDV
-const remoteConfig = await EdvClient.createEdv({config});
+const remoteConfig = await EdvClient.createEdv({ config })
 
 // connect to the new EDV via a `EdvClient`
-const client = new EdvClient({id: remoteConfig.id, keyAgreementKey, hmac});
+const client = new EdvClient({ id: remoteConfig.id, keyAgreementKey, hmac })
 // to only use fips-compliant key agreement and encryption algorithms:
-const client = new EdvClient(
-  {id: remoteConfig.id, keyAgreementKey, hmac, cipherVersion: 'fips'});
+const client = new EdvClient({
+  id: remoteConfig.id,
+  keyAgreementKey,
+  hmac,
+  cipherVersion: 'fips'
+})
 ```
 
 You can specify a url when you create and register a new EDV configuration:
 
 ```js
 // TODO: explain EDV service must be able to authenticate user
-const controller = 'account id (or DID if using zcaps) goes here';
+const controller = 'account id (or DID if using zcaps) goes here'
 
 const config = {
   // on init the sequence must be 0 and is required
@@ -144,38 +151,37 @@ const config = {
   controller,
   // TODO: Explain what 'referenceId' is
   referenceId: 'primary',
-  keyAgreementKey: {id: keyAgreementKey.id, type: keyAgreementKey.type},
-  hmac: {id: hmac.id, type: hmac.type}
-};
+  keyAgreementKey: { id: keyAgreementKey.id, type: keyAgreementKey.type },
+  hmac: { id: hmac.id, type: hmac.type }
+}
 
 // sends a POST request to the remote service to create an EDV
 const remoteConfig = await EdvClient.createEdv({
   url: 'https://server.example/edvs',
-  config,
+  config
   // must pass `invocationSigner` and optional `capability` if `controller`
   // is a DID
   /* invocationSigner, capability */
-});
+})
 
 // connect to the new EDV via a `EdvClient`
-const client = new EdvClient({id: remoteConfig.id, keyAgreementKey, hmac});
+const client = new EdvClient({ id: remoteConfig.id, keyAgreementKey, hmac })
 ```
-
 
 ### Loading a saved EDV config
 
-If you have previously registered an EDV config (via `createEdv()`),
-and you know its `id`, you can fetch its config via `get()`:
+If you have previously registered an EDV config (via `createEdv()`), and you
+know its `id`, you can fetch its config via `get()`:
 
 ```js
 // registered config
-const {id} = await EdvClient.createEdv({config});
+const { id } = await EdvClient.createEdv({ config })
 
 // later, it can be fetched via the id
-const remoteConfig = await EdvClient.getConfig({id});
+const remoteConfig = await EdvClient.getConfig({ id })
 
 // connect to the existing EDV via an `EdvClient` instance
-const client = new EdvClient({id: remoteConfig.id, keyAgreementKey, hmac});
+const client = new EdvClient({ id: remoteConfig.id, keyAgreementKey, hmac })
 ```
 
 If you know a controller/`accountId` but do not know a specific EDV `id`, you
@@ -184,9 +190,11 @@ can create a client for an EDV by a controller-scoped custom `referenceId`:
 ```js
 // get the account's 'primary' EDV config to connect to the EDV
 // note that a referenceId can be any string but must be unique per controller
-const config = await EdvClient.findConfig(
-  {controller: accountId, referenceId: 'primary'});
-const client = new EdvClient({id: config.id, keyAgreementKey, hmac});
+const config = await EdvClient.findConfig({
+  controller: accountId,
+  referenceId: 'primary'
+})
+const client = new EdvClient({ id: config.id, keyAgreementKey, hmac })
 ```
 
 ### Using a EdvClient instance for document storage
@@ -230,4 +238,5 @@ Commercial support is available by contacting
 [Digital Bazaar](https://digitalbazaar.com/) <support@digitalbazaar.com>.
 
 [Streams API]: https://developer.mozilla.org/en-US/docs/Web/API/Streams_API
-[Web Crypto API]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
+[Web Crypto API]:
+  https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
