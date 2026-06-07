@@ -17,6 +17,9 @@
   This removes the previous node/browser file substitution. React Native
   consumers must install the optional `react-native-get-random-values` peer
   dependency (see the README).
+- Replaced `base58-universal` and `base64url-universal` with `@scure/base`
+  (base58btc and unpadded base64url) via a shared internal `baseX` module. The
+  encoding output is unchanged.
 - Tooling migrated to the isomorphic library template: pnpm, `tsc` build, ESLint
   flat config + Prettier, Vitest for Node tests, and Playwright for the browser
   smoke test.

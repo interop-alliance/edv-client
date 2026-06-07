@@ -23,12 +23,9 @@ importers:
       '@noble/hashes':
         specifier: ^2.2.0
         version: 2.2.0
-      base58-universal:
-        specifier: ^2.0.0
-        version: 2.0.0
-      base64url-universal:
-        specifier: ^2.0.0
-        version: 2.0.0
+      '@scure/base':
+        specifier: ^2.2.0
+        version: 2.2.0
       canonicalize:
         specifier: ^2.0.0
         version: 2.1.0
@@ -545,6 +542,9 @@ packages:
 
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
+
+  '@scure/base@2.2.0':
+    resolution: {integrity: sha512-b8XEupJibegiXV+tDUseI8oLQc8ei3d/4Jkb2RpbHh3MfE054ov3uIz2dhFkB3FI8iwYkEh0gGCApkrYggkPNg==}
 
   '@sinclair/typebox@0.27.10':
     resolution: {integrity: sha512-MTBk/3jGLNB2tVxv6uLlFh1iu64iYOQ2PbdOSK3NW8JZsmlaOh2q6sdtKowBhfw8QFLmYNzTW4/oK4uATIi6ZA==}
@@ -2570,6 +2570,8 @@ snapshots:
     optional: true
 
   '@rolldown/pluginutils@1.0.1': {}
+
+  '@scure/base@2.2.0': {}
 
   '@sinclair/typebox@0.27.10': {}
 

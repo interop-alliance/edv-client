@@ -1,7 +1,7 @@
 /*!
  * Copyright (c) 2018-2025 Digital Bazaar, Inc. All rights reserved.
  */
-import * as base58 from 'base58-universal'
+import { base58btc } from './baseX.js'
 import {
   assert,
   assertDocId,
@@ -604,7 +604,7 @@ export class EdvClientCore {
     const random = new Uint8Array(buf.buffer, buf.byteOffset + 2, 16)
     await getRandomBytes(random)
     // multibase encoding for base58 starts with 'z'
-    return 'z' + base58.encode(buf)
+    return 'z' + base58btc.encode(buf)
   }
 
   // expose `generateId` on instance as well
