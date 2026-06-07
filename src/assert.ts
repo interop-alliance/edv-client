@@ -1,7 +1,7 @@
 /*!
  * Copyright (c) 2022 Digital Bazaar, Inc. All rights reserved.
  */
-import * as base58 from 'base58-universal'
+import { base58btc } from './baseX.js'
 
 export function assert(variable: any, name: string, types: string | string[]) {
   if (!Array.isArray(types)) {
@@ -40,7 +40,7 @@ export function assertDocument(doc: any) {
 export function assertDocId(id: any) {
   try {
     // verify ID is multibase base58-encoded 16 bytes
-    const buf = base58.decode(id.substr(1))
+    const buf = base58btc.decode(id.substr(1))
     // multibase base58 (starts with 'z')
     // 128-bit random number, multibase encoded
     // 0x00 = identity tag, 0x10 = length (16 bytes) + 16 random bytes
