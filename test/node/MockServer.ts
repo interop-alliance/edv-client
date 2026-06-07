@@ -1,7 +1,7 @@
 /*!
  * Copyright (c) 2018-2023 Digital Bazaar, Inc. All rights reserved.
  */
-import { httpClient } from '@digitalbazaar/http-client'
+import { httpClient } from '@interop/http-client'
 import { pathToRegexp } from 'path-to-regexp'
 import routeParams from 'route-params'
 import sinon from 'sinon'

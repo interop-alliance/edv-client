@@ -2,7 +2,7 @@
  * Copyright (c) 2018-2025 Digital Bazaar, Inc. All rights reserved.
  */
 import { assert, assertInvocationSigner } from './assert.js'
-import { DEFAULT_HEADERS } from '@digitalbazaar/http-client'
+import { DEFAULT_HEADERS } from '@interop/http-client'
 import { EdvClientCore } from './EdvClientCore.js'
 import { HttpsTransport } from './HttpsTransport.js'
 
@@ -644,7 +644,7 @@ export class EdvClient extends EdvClientCore {
     headers,
     capability
   }: any = {}) {
-    const results = await this.findConfigs({
+    const results: any = await this.findConfigs({
       url,
       controller,
       referenceId,
