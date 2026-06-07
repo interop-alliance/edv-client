@@ -3,7 +3,7 @@
  */
 import { base64url } from './baseX.js'
 import canonicalize from 'canonicalize'
-import { LruCache } from '@digitalbazaar/lru-memoize'
+import { LruCache } from '@interop/lru-memoize'
 import { sha256 } from './util.js'
 import split from 'split-string'
 

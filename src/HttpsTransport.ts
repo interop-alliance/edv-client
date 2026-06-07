@@ -2,8 +2,8 @@
  * Copyright (c) 2022-2023 Digital Bazaar, Inc. All rights reserved.
  */
 import { assert, assertInvocationSigner } from './assert.js'
-import { DEFAULT_HEADERS, httpClient } from '@digitalbazaar/http-client'
-import { signCapabilityInvocation } from '@digitalbazaar/http-signature-zcap-invoke'
+import { DEFAULT_HEADERS, httpClient } from '@interop/http-client'
+import { signCapabilityInvocation } from '@interop/http-signature-zcap-invoke'
 
 const ZCAP_ROOT_PREFIX = 'urn:zcap:root:'
 
@@ -267,9 +267,7 @@ export class HttpsTransport {
     if (query.count === true) {
       return response.data
     }
-    const {
-      data: { documents, documentIds, hasMore }
-    } = response
+    const { documents, documentIds, hasMore } = response.data as any
     const result: any = {}
     if (documents) {
       result.documents = documents
