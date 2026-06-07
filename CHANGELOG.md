@@ -1,5 +1,26 @@
 # @digitalbazaar/edv-client ChangeLog
 
+## 17.0.0 - TBD
+
+### Changed
+
+- **BREAKING**: Source is now written in TypeScript and the package ships a
+  compiled `dist/` build (ESM `.js` + `.d.ts` type declarations) instead of the
+  previous `lib/` JavaScript sources. The public API, behavior, and return
+  shapes are unchanged.
+- **BREAKING**: `package.json` `exports` now resolves to the built `dist/`
+  output via conditional exports (`types`, `react-native`, `import`, `default`).
+- **BREAKING**: Require Node.js >= 24.
+- The internal crypto helpers are now a single isomorphic module: random bytes
+  use the Web Crypto `globalThis.crypto.getRandomValues()` API (replacing
+  `node:crypto`) and SHA-256 uses the pure-JS `@noble/hashes` implementation.
+  This removes the previous node/browser file substitution. React Native
+  consumers must install the optional `react-native-get-random-values` peer
+  dependency (see the README).
+- Tooling migrated to the isomorphic library template: pnpm, `tsc` build, ESLint
+  flat config + Prettier, Vitest for Node tests, and Playwright for the browser
+  smoke test.
+
 ## 16.3.0 - 2025-09-17
 
 ### Changed
