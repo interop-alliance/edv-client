@@ -31,7 +31,7 @@ It consists of one main class:
 
 ## Install
 
-- Browsers and Node.js 18+ are supported.
+- Browsers and Node.js 24+ are supported.
 - [Streams API][] required. Older browsers must use a polyfill.
 - [Web Crypto API][] required. Older browsers must use a polyfill.
 
@@ -46,8 +46,39 @@ To install locally (for development):
 ```sh
 git clone https://github.com/digitalbazaar/edv-client.git
 cd edv-client
-npm install
+pnpm install
 ```
+
+This library is written in TypeScript and built with `tsc`. Common scripts:
+
+```sh
+pnpm run build         # compile src/ to dist/
+pnpm run lint          # eslint
+pnpm run test:node     # vitest (Node)
+pnpm run test:browser  # playwright (browser smoke test)
+```
+
+### React Native
+
+This library is isomorphic and runs on React Native, with one environment
+requirement: it uses the Web Crypto `crypto.getRandomValues()` API to generate
+random identifiers, which React Native does not provide natively. Consumers must
+install the [`react-native-get-random-values`][] polyfill and import it
+**once**, before any `edv-client` code runs (typically at the very top of your
+app entry, e.g. `index.js`):
+
+```sh
+npm install react-native-get-random-values
+```
+
+```js
+// must be the first import in your app entry
+import 'react-native-get-random-values'
+```
+
+It is declared as an optional `peerDependency`. No additional shim is needed for
+hashing -- SHA-256 is provided by the pure-JS [`@noble/hashes`][]
+implementation.
 
 ## Usage
 
@@ -237,6 +268,9 @@ If editing the Readme, please conform to the
 Commercial support is available by contacting
 [Digital Bazaar](https://digitalbazaar.com/) <support@digitalbazaar.com>.
 
+[`@noble/hashes`]: https://github.com/paulmillr/noble-hashes
+[`react-native-get-random-values`]:
+  https://github.com/LinusU/react-native-get-random-values
 [Streams API]: https://developer.mozilla.org/en-US/docs/Web/API/Streams_API
 [Web Crypto API]:
   https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
