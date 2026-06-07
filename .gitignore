@@ -2,6 +2,7 @@
 *.sw[nop]
 *~
 .cache
+_spec
 .nyc_output
 .project
 .settings
@@ -10,4 +11,6 @@ TAGS
 coverage
 dist
 node_modules
+playwright-report
 reports
+test-results
