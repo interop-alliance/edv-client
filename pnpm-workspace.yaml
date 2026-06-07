@@ -1,0 +1,5 @@
+minimumReleaseAgeExclude:
+  - '@interop/data-integrity-core@6.4.0'
+  - '@interop/ecdsa-multikey@2.2.0'
+  - '@interop/minimal-cipher@7.1.0'
+  - '@interop/http-signature-zcap-invoke@6.2.1'

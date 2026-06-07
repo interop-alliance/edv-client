@@ -1,17 +1,24 @@
 /*!
  * Copyright (c) 2019-2020 Digital Bazaar, Inc. All rights reserved.
  */
+import type {
+  IHMAC,
+  IKeyAgreementKey,
+  IKeyResolver,
+  IRecipient,
+  ISigner
+} from '@interop/data-integrity-core'
 import { EdvClient } from './EdvClient.js'
 
 export class EdvDocument {
-  id: any
-  recipients: any
-  keyResolver: any
-  keyAgreementKey: any
-  hmac: any
+  id?: string
+  recipients: IRecipient[]
+  keyResolver?: IKeyResolver
+  keyAgreementKey?: IKeyAgreementKey
+  hmac?: IHMAC
   capability: any
-  invocationSigner: any
-  client: any
+  invocationSigner?: ISigner
+  client: EdvClient
 
   /**
    * Creates a new instance of a EdvDocument.
