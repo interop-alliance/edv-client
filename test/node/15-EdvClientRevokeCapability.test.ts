@@ -1,12 +1,9 @@
 /*!
  * Copyright (c) 2018-2023 Digital Bazaar, Inc. All rights reserved.
  */
-import {
-  CapabilityDelegation,
-  constants as zcapConstants
-} from '@digitalbazaar/zcap'
+import { CapabilityDelegation, constants as zcapConstants } from '@interop/zcap'
 import { createRecipient, JWE_ALG } from './test-utils.js'
-import { Ed25519Signature2020 } from '@digitalbazaar/ed25519-signature-2020'
+import { Ed25519Signature2020 } from '@interop/ed25519-signature/ed25519-signature-2020'
 import { EdvClient } from '../../src/index.js'
 import jsigs from 'jsonld-signatures'
 import mock from './mock.js'
