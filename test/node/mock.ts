@@ -1,16 +1,17 @@
 /*!
  * Copyright (c) 2018-2023 Digital Bazaar, Inc. All rights reserved.
  */
-import * as didMethodKey from '@digitalbazaar/did-method-key'
-import * as EcdsaMultikey from '@digitalbazaar/ecdsa-multikey'
+import * as didMethodKey from '@interop/did-method-key'
+import type { FromMultibase } from '@interop/did-method-key'
+import * as EcdsaMultikey from '@interop/ecdsa-multikey'
 import { BASE_URL, MockStorage } from './MockStorage.js'
-import { Ed25519VerificationKey2020 } from '@digitalbazaar/ed25519-verification-key-2020'
+import { Ed25519VerificationKey } from '@interop/ed25519-verification-key'
 import { EdvClient } from '../../src/index.js'
 import { MockHmac } from './MockHmac.js'
 import { MockServer } from './MockServer.js'
-import { securityLoader } from '@digitalbazaar/security-document-loader'
-import { X25519KeyAgreementKey2020 } from '@digitalbazaar/x25519-key-agreement-key-2020'
-import { constants as zcapConstants } from '@digitalbazaar/zcap'
+import { securityLoader } from '@interop/security-document-loader'
+import { X25519KeyAgreementKey2020 } from '@interop/x25519-key-agreement-key'
+import { constants as zcapConstants } from '@interop/zcap'
 
 const loader = securityLoader()
 loader.addStatic(zcapConstants.ZCAP_CONTEXT_URL, zcapConstants.ZCAP_CONTEXT)
@@ -19,11 +20,16 @@ const securityDocumentLoader = loader.build()
 const didKeyDriver = didMethodKey.driver()
 didKeyDriver.use({
   multibaseMultikeyHeader: 'z6Mk',
-  fromMultibase: Ed25519VerificationKey2020.from
+  fromMultibase: Ed25519VerificationKey.from,
+  // derive an X25519 keyAgreement key from the Ed25519 key (off by default in
+  // the fork) so resolved did:key documents include a keyAgreement method
+  enableEncryptionKeyDerivation: true
 })
 didKeyDriver.use({
   multibaseMultikeyHeader: 'zDna',
-  fromMultibase: EcdsaMultikey.from
+  // EcdsaMultikey.from returns the fork's KeyPairInterface; cast to the
+  // driver's FromMultibase deserializer type.
+  fromMultibase: EcdsaMultikey.from as unknown as FromMultibase
 })
 
 export { BASE_URL }
@@ -127,7 +133,7 @@ export class TestMock {
 
   async createCapabilityAgent() {
     // create capability agent for signing zcaps
-    const verificationKeyPair = await Ed25519VerificationKey2020.generate()
+    const verificationKeyPair = await Ed25519VerificationKey.generate()
     const { methodFor } = await didKeyDriver.fromKeyPair({
       verificationKeyPair
     })

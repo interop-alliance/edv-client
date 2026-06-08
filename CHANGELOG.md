@@ -26,14 +26,15 @@
   unchanged.
 - Replaced `@digitalbazaar/minimal-cipher@6` with the TypeScript
   `@interop/minimal-cipher@7` fork. The imported `Cipher` API is unchanged.
-- Adopted shared types from `@interop/data-integrity-core` (new dependency):
-  the cipher property is typed as `Cipher`, and key agreement keys, key
-  resolvers, HMAC APIs, JWE recipients, and invocation signers now use the
-  `IKeyAgreementKey`, `IKeyResolver`, `IHMAC`, `IRecipient`, and `ISigner`
-  types in place of `any`.
+- Adopted shared types from `@interop/data-integrity-core` (new dependency): the
+  cipher property is typed as `Cipher`, and key agreement keys, key resolvers,
+  HMAC APIs, JWE recipients, and invocation signers now use the
+  `IKeyAgreementKey`, `IKeyResolver`, `IHMAC`, `IRecipient`, and `ISigner` types
+  in place of `any`.
 - Tooling migrated to the isomorphic library template: pnpm, `tsc` build, ESLint
   flat config + Prettier, Vitest for Node tests, and Playwright for the browser
   smoke test.
+- Replace `@digitalbazaar/` dev deps with `@interop/` TypeScript forks.
 
 ## 16.3.0 - 2025-09-17
 
