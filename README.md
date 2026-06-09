@@ -1,5 +1,8 @@
 # JavaScript Encrypted Data Vault Client _(@interop/edv-client)_
 
+[![Node.js CI](https://github.com/interop-alliance/edv-client/workflows/CI/badge.svg)](https://github.com/interop-alliance/edv-client/actions?query=workflow%3A%22CI%22)
+[![NPM Version](https://img.shields.io/npm/v/@interop/edv-client.svg)](https://npm.im/@interop/edv-client)
+
 > A JavaScript library for Web and node.js apps for interfacing with a remote
 > Encrypted Data Vault server
 
