@@ -1,9 +1,11 @@
-# @digitalbazaar/edv-client ChangeLog
+# @interop/edv-client ChangeLog
 
 ## 17.0.0 - TBD
 
 ### Changed
 
+- **BREAKING**: Forked and renamed package to `@interop/edv-client`. The repository
+  now lives at `https://github.com/interop-alliance/edv-client`.
 - **BREAKING**: Source is now written in TypeScript and the package ships a
   compiled `dist/` build (ESM `.js` + `.d.ts` type declarations) instead of the
   previous `lib/` JavaScript sources. The public API, behavior, and return

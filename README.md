@@ -1,4 +1,4 @@
-# JavaScript Encrypted Data Vault Client _(@digitalbazaar/edv-client)_
+# JavaScript Encrypted Data Vault Client _(@interop/edv-client)_
 
 > A JavaScript library for Web and node.js apps for interfacing with a remote
 > Encrypted Data Vault server
@@ -38,13 +38,13 @@ It consists of one main class:
 To install from NPM:
 
 ```sh
-npm install @digitalbazaar/edv-client
+npm install @interop/edv-client
 ```
 
 To install locally (for development):
 
 ```sh
-git clone https://github.com/digitalbazaar/edv-client.git
+git clone https://github.com/interop-alliance/edv-client.git
 cd edv-client
 pnpm install
 ```
@@ -92,7 +92,7 @@ show a simpler local example):
 
 ```js
 import { CapabilityAgent, KeystoreAgent, KmsClient } from 'webkms-client'
-import { EdvClient } from 'edv-client'
+import { EdvClient } from '@interop/edv-client'
 ```
 
 Although Encrypted Data Vaults are not bound to any particular key management
