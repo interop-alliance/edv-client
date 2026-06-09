@@ -35,6 +35,10 @@
   flat config + Prettier, Vitest for Node tests, and Playwright for the browser
   smoke test.
 - Replace `@digitalbazaar/` dev deps with `@interop/` TypeScript forks.
+- Update `canonicalize` to `3.0.0` (now ships its own type declarations, so the
+  ambient module shim was removed). The canonicalization output is unchanged.
+- Update the `path-to-regexp` dev dependency to `8.x`, used only by the Node
+  test MockServer.
 
 ## 16.3.0 - 2025-09-17
 
