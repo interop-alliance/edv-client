@@ -13,7 +13,7 @@ import type {
   IHMAC,
   IKeyAgreementKey,
   IKeyResolver,
-  IRecipient
+  IRecipientTemplate
 } from '@interop/data-integrity-core'
 import { getRandomBytes } from './util.js'
 import { IndexHelper } from './IndexHelper.js'
@@ -619,7 +619,7 @@ export class EdvClientCore {
   }
 
   // helper to create default recipients
-  _createDefaultRecipients(keyAgreementKey: IKeyAgreementKey): IRecipient[] {
+  _createDefaultRecipients(keyAgreementKey: IKeyAgreementKey): IRecipientTemplate[] {
     return keyAgreementKey
       ? [
           {
