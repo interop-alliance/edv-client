@@ -17,12 +17,6 @@ import type { IZcap } from '@interop/data-integrity-core'
 export const ZCAP_ROOT_PREFIX = 'urn:zcap:root:'
 
 /**
- * The authorization capability (zcap) to invoke for an operation: either a
- * delegated/root zcap object or a root zcap URN string.
- */
-export type Capability = IZcap | string
-
-/**
  * Gets the invocation target (an `https` URL) for a capability.
  *
  * @param {object} options - The options to use.
@@ -35,7 +29,7 @@ export type Capability = IZcap | string
 export function getInvocationTarget({
   capability
 }: {
-  capability?: Capability
+  capability?: IZcap | string
 } = {}): string | null {
   // no capability, so no invocation target
   if (capability === undefined || capability === null) {
@@ -79,7 +73,7 @@ export function getInvocationTarget({
 export function parseEdvId({
   capability
 }: {
-  capability?: Capability
+  capability?: IZcap | string
 } = {}): string {
   const invocationTarget = getInvocationTarget({ capability }) as string
   const start = invocationTarget.lastIndexOf('/edvs/')
