@@ -4,6 +4,18 @@
 
 ### Fixed
 
+- `HttpsTransport.revokeCapability()` no longer throws
+  "this.parseEdvId is not a function" when neither an `edvId` nor an object
+  `capability` is configured. In that branch it derives the EDV ID from the
+  capability being revoked; it previously called `this.parseEdvId()`, which is
+  defined only on `EdvClient`, not `HttpsTransport`. The EDV-ID parsing now
+  lives in the shared `zcapUrls` helpers and is used directly. (This bug is also
+  present in the upstream Digital Bazaar `edv-client`.)
+- `HttpsTransport.updateConfig()` now returns after sending the unsigned request
+  when no `invocationSigner` is given. It previously omitted the `return` and
+  fell through to also call `_signedHttpPost()`, double-posting the config and
+  signing with an `undefined` signer. (This bug is also present in the upstream
+  Digital Bazaar `edv-client`.)
 - `HttpsTransport._getInvocationTarget()` now strips the `urn:zcap:root:` prefix
   from a string root zcap and returns the bare invocation target URL. It
   previously called `substring(ZCAP_ROOT_PREFIX)` (a string, coerced to `NaN` ->
@@ -15,6 +27,25 @@
 
 ### Changed
 
+- Factor the repeated per-call `HttpsTransport` construction in `EdvClient`
+  (every instance method built one inline from the client's `edvId`, agent, and
+  default headers) into a single private `_createTransport()` helper. The
+  per-call `capability` / `invocationSigner` / `headers` are passed through
+  unchanged, so each method controls its own defaulting. No public API or
+  behavior change.
+- De-duplicate the `Capability` and `HttpsAgent` type aliases: `Capability` now
+  comes from the shared `zcapUrls` module and `HttpsAgent` is exported from
+  `HttpsTransport`, so `EdvClient` imports both rather than redeclaring them.
+- Replace the `any`-typed option parameters on `HttpsTransport`'s internal
+  `_signedHttpGet()` / `_signedHttpPost()` helpers with named interfaces, and
+  type the `find()` result shape. `edvId` / `url` remain intentionally loose to
+  avoid threading nullability casts through every request path.
+- Move the zcap-URL helpers `getInvocationTarget()` and `parseEdvId()` into a
+  new shared `zcapUrls` module. `HttpsTransport._getInvocationTarget()`,
+  `EdvClient._getInvocationTarget()`, and `EdvClient._parseEdvId()` are retained
+  as thin delegates for backwards compatibility, and `EdvDocument` and
+  `HttpsTransport` now call the helpers directly. No public API or behavior
+  change.
 - `HttpsTransport` now extends the `Transport` base class (overriding each of
   its operations), and `assertTransport()` requires a `Transport` instance
   rather than accepting any object. Custom transports must now extend
