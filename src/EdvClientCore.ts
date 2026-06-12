@@ -41,26 +41,6 @@ export type EqualsFilter =
 export type HasFilter = string | string[]
 
 /**
- * Options for the `EdvClientCore` constructor.
- */
-export interface IEdvClientCoreOptions {
-  hmac?: IHMAC
-  id?: string
-  keyAgreementKey?: IKeyAgreementKey
-  keyResolver?: IKeyResolver
-  cipherVersion?: 'recommended' | 'fips'
-  _attributeVersion?: number
-}
-
-/**
- * Options for `ensureIndex`.
- */
-export interface IEnsureIndexOptions {
-  attribute?: string | string[]
-  unique?: boolean
-}
-
-/**
  * Options shared by the core document write methods (`insert` / `update`).
  */
 export interface IWriteOptions {
@@ -71,44 +51,6 @@ export interface IWriteOptions {
   keyResolver?: IKeyResolver
   keyAgreementKey?: IKeyAgreementKey
   hmac?: IHMAC
-  transport?: Transport
-}
-
-/**
- * Options for `updateIndex`.
- */
-export interface IUpdateIndexOptions {
-  doc?: IEDVDocument
-  hmac?: IHMAC
-  transport?: Transport
-}
-
-/**
- * Options for `delete`.
- */
-export interface IDeleteOptions {
-  doc?: IEDVDocument
-  recipients?: IRecipientTemplate[]
-  keyResolver?: IKeyResolver
-  keyAgreementKey?: IKeyAgreementKey
-  transport?: Transport
-}
-
-/**
- * Options for `get`.
- */
-export interface IGetOptions {
-  id?: string
-  keyAgreementKey?: IKeyAgreementKey
-  transport?: Transport
-}
-
-/**
- * Options for `getStream`.
- */
-export interface IGetStreamOptions {
-  doc?: IEDVDocument
-  keyAgreementKey?: IKeyAgreementKey
   transport?: Transport
 }
 
@@ -130,22 +72,6 @@ export interface IFindOptions extends ICountOptions {
   returnDocuments?: boolean
   count?: boolean
   limit?: number
-}
-
-/**
- * Options for `getConfig`.
- */
-export interface IGetConfigOptions {
-  id?: string
-  transport?: Transport
-}
-
-/**
- * Options for `updateConfig`.
- */
-export interface IUpdateConfigOptions {
-  config?: IEDVConfig
-  transport?: Transport
 }
 
 export class EdvClientCore {
@@ -182,7 +108,14 @@ export class EdvClientCore {
     keyResolver,
     cipherVersion = 'recommended',
     _attributeVersion = 2
-  }: IEdvClientCoreOptions = {}) {
+  }: {
+    hmac?: IHMAC
+    id?: string
+    keyAgreementKey?: IKeyAgreementKey
+    keyResolver?: IKeyResolver
+    cipherVersion?: 'recommended' | 'fips'
+    _attributeVersion?: number
+  } = {}) {
     if (id !== undefined) {
       assert(id, 'id', 'string')
     }
@@ -212,7 +145,10 @@ export class EdvClientCore {
    * @param {boolean} [options.unique=false] - Should be `true` if the index is
    *   considered unique, `false` if not.
    */
-  ensureIndex({ attribute, unique = false }: IEnsureIndexOptions = {}) {
+  ensureIndex({
+    attribute,
+    unique = false
+  }: { attribute?: string | string[]; unique?: boolean } = {}) {
     this.indexHelper.ensureIndex({ attribute, unique, hmac: this.hmac })
   }
 
@@ -423,7 +359,7 @@ export class EdvClientCore {
     doc,
     hmac = this.hmac,
     transport
-  }: IUpdateIndexOptions = {}) {
+  }: { doc?: IEDVDocument; hmac?: IHMAC; transport?: Transport } = {}) {
     assertDocument(doc)
     assertDocId(doc.id)
     assertTransport(transport)
@@ -460,7 +396,13 @@ export class EdvClientCore {
     keyResolver = this.keyResolver,
     keyAgreementKey = this.keyAgreementKey,
     transport
-  }: IDeleteOptions = {}) {
+  }: {
+    doc?: IEDVDocument
+    recipients?: IRecipientTemplate[]
+    keyResolver?: IKeyResolver
+    keyAgreementKey?: IKeyAgreementKey
+    transport?: Transport
+  } = {}) {
     assertDocument(doc)
     assertDocId(doc.id)
     assertTransport(transport)
@@ -497,7 +439,11 @@ export class EdvClientCore {
     id,
     keyAgreementKey = this.keyAgreementKey,
     transport
-  }: IGetOptions = {}) {
+  }: {
+    id?: string
+    keyAgreementKey?: IKeyAgreementKey
+    transport?: Transport
+  } = {}) {
     assert(id, 'id', 'string')
     assertTransport(transport)
 
@@ -524,7 +470,11 @@ export class EdvClientCore {
     doc,
     keyAgreementKey = this.keyAgreementKey,
     transport
-  }: IGetStreamOptions = {}) {
+  }: {
+    doc?: IEDVDocument
+    keyAgreementKey?: IKeyAgreementKey
+    transport?: Transport
+  } = {}) {
     assert(doc, 'doc', 'object')
     assertDocId(doc.id)
     assert(doc.stream, 'doc.stream', 'object')
@@ -699,7 +649,10 @@ export class EdvClientCore {
    *
    * @returns {Promise<object>} - Resolves to the configuration for the EDV.
    */
-  async getConfig({ id, transport }: IGetConfigOptions = {}) {
+  async getConfig({
+    id,
+    transport
+  }: { id?: string; transport?: Transport } = {}) {
     assertTransport(transport)
     return transport.getConfig({ id })
   }
@@ -715,7 +668,10 @@ export class EdvClientCore {
    *
    * @returns {Promise} - Resolves once the operation completes.
    */
-  async updateConfig({ config, transport }: IUpdateConfigOptions = {}) {
+  async updateConfig({
+    config,
+    transport
+  }: { config?: IEDVConfig; transport?: Transport } = {}) {
     assertTransport(transport)
 
     if (!(config && typeof config === 'object')) {

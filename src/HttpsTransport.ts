@@ -4,25 +4,25 @@
 import { assert, assertInvocationSigner } from './assert.js'
 import { DEFAULT_HEADERS, httpClient } from '@interop/http-client'
 import { signCapabilityInvocation } from '@interop/http-signature-zcap-invoke'
-import type { ISigner } from '@interop/data-integrity-core'
+import type {
+  IEDVConfig,
+  IEDVQuery,
+  IEncryptedDocument,
+  ISigner,
+  IZcap
+} from '@interop/data-integrity-core'
 import { Transport } from './Transport.js'
 import {
   getInvocationTarget,
   parseEdvId,
-  ZCAP_ROOT_PREFIX,
-  type Capability
+  ZCAP_ROOT_PREFIX
 } from './zcapUrls.js'
 import type {
   ITransportCreateEdvOptions,
   ITransportFindConfigsOptions,
-  ITransportFindOptions,
-  ITransportGetByIdOptions,
   ITransportGetChunkOptions,
-  ITransportRevokeCapabilityOptions,
   ITransportStoreChunkOptions,
-  ITransportUpdateConfigOptions,
-  ITransportUpdateIndexOptions,
-  ITransportWriteOptions
+  ITransportUpdateIndexOptions
 } from './Transport.js'
 
 /**
@@ -32,23 +32,11 @@ import type {
 export type HttpsAgent = any
 
 /**
- * Options for the `HttpsTransport` constructor.
- */
-export interface IHttpsTransportOptions {
-  capability?: Capability
-  defaultHeaders?: Record<string, string>
-  edvId?: string
-  httpsAgent?: HttpsAgent
-  invocationSigner?: ISigner
-  url?: string
-}
-
-/**
  * Options for the internal `_signedHttpGet` helper.
  */
 interface ISignedHttpGetOptions {
   url: string
-  capability?: Capability
+  capability?: IZcap | string
   notFoundMessage?: string
 }
 
@@ -58,7 +46,7 @@ interface ISignedHttpGetOptions {
 interface ISignedHttpPostOptions {
   url: string
   json?: object
-  capability?: Capability
+  capability?: IZcap | string
   capabilityAction?: string
   insert?: boolean
 }
@@ -73,7 +61,7 @@ interface IFindResult {
 }
 
 export class HttpsTransport extends Transport {
-  capability?: Capability
+  capability?: IZcap | string
   defaultHeaders: Record<string, string>
   // `edvId` and `url` are URL-building plumbing passed through to the HTTP
   // client and URL helpers; kept loose to avoid threading nullability casts
@@ -109,7 +97,14 @@ export class HttpsTransport extends Transport {
     httpsAgent,
     invocationSigner,
     url
-  }: IHttpsTransportOptions = {}) {
+  }: {
+    capability?: IZcap | string
+    defaultHeaders?: Record<string, string>
+    edvId?: string
+    httpsAgent?: HttpsAgent
+    invocationSigner?: ISigner
+    url?: string
+  } = {}) {
     super()
     if (url !== undefined) {
       assert(url, 'url', 'string')
@@ -134,9 +129,7 @@ export class HttpsTransport extends Transport {
   override async createEdv({ config }: ITransportCreateEdvOptions = {}) {
     let { capability, url } = this
     if (!url) {
-      url =
-        getInvocationTarget({ capability }) ||
-        _createAbsoluteUrl('/edvs')
+      url = getInvocationTarget({ capability }) || _createAbsoluteUrl('/edvs')
     }
 
     // no invocationSigner was provided, submit the request without a zCap
@@ -167,7 +160,7 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async getConfig({ id = this.edvId }: ITransportGetByIdOptions = {}) {
+  override async getConfig({ id = this.edvId }: { id?: string } = {}) {
     const { capability } = this
     if (!(id || capability)) {
       throw new TypeError('"capability" is required if "id" was not provided.')
@@ -196,7 +189,7 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async updateConfig({ config }: ITransportUpdateConfigOptions = {}) {
+  override async updateConfig({ config }: { config?: IEDVConfig } = {}) {
     const { capability, edvId } = this
     if (!(edvId || capability)) {
       throw new TypeError(
@@ -232,9 +225,7 @@ export class HttpsTransport extends Transport {
   }: ITransportFindConfigsOptions = {}) {
     let { capability, url } = this
     if (!url) {
-      url =
-        getInvocationTarget({ capability }) ||
-        _createAbsoluteUrl('/edvs')
+      url = getInvocationTarget({ capability }) || _createAbsoluteUrl('/edvs')
     }
 
     // eliminate undefined properties, to prevent expression of them using
@@ -270,7 +261,7 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async insert({ encrypted }: ITransportWriteOptions = {}) {
+  override async insert({ encrypted }: { encrypted?: IEncryptedDocument } = {}) {
     assert(encrypted, 'encrypted', 'object')
     // trim document ID and trailing slash to post to `/documents`
     let url = this._getDocUrl(encrypted.id, this.capability)
@@ -283,7 +274,7 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async update({ encrypted }: ITransportWriteOptions = {}) {
+  override async update({ encrypted }: { encrypted?: IEncryptedDocument } = {}) {
     assert(encrypted, 'encrypted', 'object')
     const url = this._getDocUrl(encrypted.id, this.capability)
     await this._signedHttpPost({ url, json: encrypted, insert: false })
@@ -303,7 +294,7 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async get({ id }: ITransportGetByIdOptions = {}) {
+  override async get({ id }: { id?: string } = {}) {
     const url = this._getDocUrl(id, this.capability)
     const response = await this._signedHttpGet({
       url,
@@ -315,7 +306,7 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async find({ query }: ITransportFindOptions = {}) {
+  override async find({ query }: { query?: IEDVQuery } = {}) {
     assert(query, 'query', 'object')
     const { capability, edvId } = this
     let url = getInvocationTarget({ capability })
@@ -367,7 +358,7 @@ export class HttpsTransport extends Transport {
    */
   override async revokeCapability({
     capabilityToRevoke
-  }: ITransportRevokeCapabilityOptions = {}) {
+  }: { capabilityToRevoke?: IZcap } = {}) {
     assert(capabilityToRevoke, 'capabilityToRevoke', 'object')
 
     let { edvId, capability } = this
@@ -521,7 +512,7 @@ export class HttpsTransport extends Transport {
   }
 
   // retained for backwards compatibility; delegates to the shared helper
-  static _getInvocationTarget({ capability }: { capability?: Capability }) {
+  static _getInvocationTarget({ capability }: { capability?: IZcap | string }) {
     return getInvocationTarget({ capability })
   }
 }

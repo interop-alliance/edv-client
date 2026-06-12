@@ -16,31 +16,15 @@ import type {
 import { EdvClientCore } from './EdvClientCore.js'
 import type { EqualsFilter, HasFilter } from './EdvClientCore.js'
 import { HttpsTransport, type HttpsAgent } from './HttpsTransport.js'
-import { getInvocationTarget, parseEdvId, type Capability } from './zcapUrls.js'
+import { getInvocationTarget, parseEdvId } from './zcapUrls.js'
 
 /**
  * Options shared by every method that authorizes an EDV operation with a zcap
  * invocation.
  */
 export interface IZcapAuthOptions {
-  capability?: Capability
+  capability?: IZcap | string
   invocationSigner?: ISigner
-}
-
-/**
- * Options for the `EdvClient` constructor.
- */
-export interface IEdvClientOptions {
-  capability?: Capability
-  defaultHeaders?: Record<string, string>
-  hmac?: IHMAC
-  id?: string
-  invocationSigner?: ISigner
-  httpsAgent?: HttpsAgent
-  keyAgreementKey?: IKeyAgreementKey
-  keyResolver?: IKeyResolver
-  cipherVersion?: 'recommended' | 'fips'
-  _attributeVersion?: number
 }
 
 /**
@@ -133,13 +117,6 @@ export interface IRevokeCapabilityOptions extends IZcapAuthOptions {
 }
 
 /**
- * Options for `parseEdvId` and the static invocation-target helpers.
- */
-export interface IParseEdvIdOptions {
-  capability?: Capability
-}
-
-/**
  * Options for the static `createEdv`.
  */
 export interface ICreateEdvOptions extends IZcapAuthOptions {
@@ -163,16 +140,6 @@ export interface IFindConfigsOptions extends IZcapAuthOptions {
 }
 
 /**
- * Options for the static `_migrate` helper.
- */
-export interface IMigrateOptions {
-  from?: EdvClient
-  to?: EdvClient
-  equals?: EqualsFilter
-  has?: HasFilter
-}
-
-/**
  * Note: An Encrypted Data Vault (EDV) server MUST expose an HTTPS API with a
  * URL structure that is partitioned like so:
  *
@@ -184,7 +151,7 @@ export interface IMigrateOptions {
  */
 
 export class EdvClient extends EdvClientCore {
-  capability?: Capability
+  capability?: IZcap | string
   invocationSigner?: ISigner
   httpsAgent?: HttpsAgent
   defaultHeaders: Record<string, string>
@@ -232,7 +199,18 @@ export class EdvClient extends EdvClientCore {
     keyResolver,
     cipherVersion = 'recommended',
     _attributeVersion
-  }: IEdvClientOptions = {}) {
+  }: {
+    capability?: IZcap | string
+    defaultHeaders?: Record<string, string>
+    hmac?: IHMAC
+    id?: string
+    invocationSigner?: ISigner
+    httpsAgent?: HttpsAgent
+    keyAgreementKey?: IKeyAgreementKey
+    keyResolver?: IKeyResolver
+    cipherVersion?: 'recommended' | 'fips'
+    _attributeVersion?: number
+  } = {}) {
     if (capability !== undefined) {
       assert(capability, 'capability', 'object')
       if (!id) {
@@ -283,14 +261,16 @@ export class EdvClient extends EdvClientCore {
     invocationSigner,
     headers
   }: {
-    capability?: Capability
+    capability?: IZcap | string
     invocationSigner?: ISigner
     headers?: Record<string, string>
   } = {}): HttpsTransport {
     const { defaultHeaders, httpsAgent, id: edvId } = this
     return new HttpsTransport({
       capability,
-      defaultHeaders: headers ? { ...defaultHeaders, ...headers } : defaultHeaders,
+      defaultHeaders: headers
+        ? { ...defaultHeaders, ...headers }
+        : defaultHeaders,
       edvId,
       httpsAgent,
       invocationSigner
@@ -712,7 +692,7 @@ export class EdvClient extends EdvClientCore {
    *
    * @returns {string} - The ID of the EDV.
    */
-  parseEdvId({ capability }: IParseEdvIdOptions = {}) {
+  parseEdvId({ capability }: { capability?: IZcap | string } = {}) {
     return EdvClient._parseEdvId({ capability })
   }
 
@@ -872,7 +852,17 @@ export class EdvClient extends EdvClientCore {
    *
    * @returns {Promise} Resolves once the operation completes.
    */
-  static async _migrate({ from, to, equals, has }: IMigrateOptions = {}) {
+  static async _migrate({
+    from,
+    to,
+    equals,
+    has
+  }: {
+    from?: EdvClient
+    to?: EdvClient
+    equals?: EqualsFilter
+    has?: HasFilter
+  } = {}) {
     assert(from, 'from', 'object')
     assert(to, 'to', 'object')
 
@@ -904,13 +894,13 @@ export class EdvClient extends EdvClientCore {
    *
    * @returns {string} - The ID of the EDV.
    */
-  static _parseEdvId({ capability }: IParseEdvIdOptions = {}) {
+  static _parseEdvId({ capability }: { capability?: IZcap | string } = {}) {
     return parseEdvId({ capability })
   }
 
   // retained for backwards compatibility; delegates to the shared helper in
   // `zcapUrls`
-  static _getInvocationTarget({ capability }: IParseEdvIdOptions) {
+  static _getInvocationTarget({ capability }: { capability?: IZcap | string }) {
     return getInvocationTarget({ capability })
   }
 }

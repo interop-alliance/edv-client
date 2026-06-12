@@ -19,20 +19,6 @@ export interface ITransportCreateEdvOptions {
 }
 
 /**
- * Options for `getConfig` and `get` (both keyed by an ID).
- */
-export interface ITransportGetByIdOptions {
-  id?: string
-}
-
-/**
- * Options for `updateConfig`.
- */
-export interface ITransportUpdateConfigOptions {
-  config?: IEDVConfig
-}
-
-/**
  * Options for `findConfigs`.
  */
 export interface ITransportFindConfigsOptions {
@@ -43,32 +29,11 @@ export interface ITransportFindConfigsOptions {
 }
 
 /**
- * Options for `insert` / `update` (both send an encrypted document).
- */
-export interface ITransportWriteOptions {
-  encrypted?: IEncryptedDocument
-}
-
-/**
  * Options for `updateIndex`.
  */
 export interface ITransportUpdateIndexOptions {
   docId?: string
   entry?: IIndexEntry
-}
-
-/**
- * Options for `find`.
- */
-export interface ITransportFindOptions {
-  query?: IEDVQuery
-}
-
-/**
- * Options for `revokeCapability`.
- */
-export interface ITransportRevokeCapabilityOptions {
-  capabilityToRevoke?: IZcap
 }
 
 /**
@@ -123,7 +88,7 @@ export class Transport {
    * @returns {Promise<object>} - Resolves to the configuration for the EDV.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getConfig({ id }: ITransportGetByIdOptions = {}): Promise<any> {
+  async getConfig({ id }: { id?: string } = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -140,7 +105,7 @@ export class Transport {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   async updateConfig({
     config
-  }: ITransportUpdateConfigOptions = {}): Promise<any> {
+  }: { config?: IEDVConfig } = {}): Promise<any> {
     _throwNotImplemented()
   }
   /* eslint-enable @typescript-eslint/no-unused-vars */
@@ -177,10 +142,13 @@ export class Transport {
    *
    * @returns {Promise} - Settles once the operation completes.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async insert({ encrypted }: ITransportWriteOptions = {}): Promise<any> {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  async insert({
+    encrypted
+  }: { encrypted?: IEncryptedDocument } = {}): Promise<any> {
     _throwNotImplemented()
   }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   /**
    * Sends an encrypted document to an EDV server. If the document does not
@@ -192,10 +160,13 @@ export class Transport {
    *
    * @returns {Promise} - Settles once the operation completes.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async update({ encrypted }: ITransportWriteOptions = {}): Promise<any> {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  async update({
+    encrypted
+  }: { encrypted?: IEncryptedDocument } = {}): Promise<any> {
     _throwNotImplemented()
   }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   /**
    * Sends an update for an index for the given document, without updating the
@@ -230,7 +201,7 @@ export class Transport {
    * @returns {Promise<object>} - Resolves to the encrypted document.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async get({ id }: ITransportGetByIdOptions = {}): Promise<any> {
+  async get({ id }: { id?: string } = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -245,7 +216,7 @@ export class Transport {
    *   `{documents: [...]}` or `{count: docCount}` if `query.count === true`.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async find({ query }: ITransportFindOptions = {}): Promise<any> {
+  async find({ query }: { query?: IEDVQuery } = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -260,7 +231,7 @@ export class Transport {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   async revokeCapability({
     capabilityToRevoke
-  }: ITransportRevokeCapabilityOptions = {}): Promise<any> {
+  }: { capabilityToRevoke?: IZcap } = {}): Promise<any> {
     _throwNotImplemented()
   }
   /* eslint-enable @typescript-eslint/no-unused-vars */
