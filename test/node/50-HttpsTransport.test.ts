@@ -20,6 +20,8 @@ describe('HttpsTransport (characterization)', () => {
   // capture the most recent request bodies for the extra routes below
   let lastConfigPost: any = null
   let lastIndexPost: any = null
+  // count config posts so we can detect the (previously buggy) double-post
+  let configPostCount = 0
 
   beforeAll(async () => {
     await mock.init()
@@ -31,6 +33,7 @@ describe('HttpsTransport (characterization)', () => {
     // methods. Register minimal handlers so we can pin their request behavior.
     mock.server.post(`${BASE_URL}/edvs/:edvId`, (request: any) => {
       lastConfigPost = request
+      configPostCount++
       return [200, undefined, JSON.parse(request.requestBody).json]
     })
     mock.server.post(
@@ -72,6 +75,24 @@ describe('HttpsTransport (characterization)', () => {
       should.exist(err)
       err.should.be.instanceOf(TypeError)
     })
+
+    // Regression: with no `invocationSigner`, `updateConfig` must send a single
+    // unsigned post and return. Previously it fell through (missing `return`)
+    // and also called `_signedHttpPost`, double-posting and signing with an
+    // undefined signer.
+    it('sends a single unsigned post when no signer is given', async () => {
+      const transport = new HttpsTransport({ edvId })
+      const config = { id: edvId, sequence: 1, controller: invocationSigner.id }
+      configPostCount = 0
+      let err: any
+      try {
+        await transport.updateConfig({ config })
+      } catch (caught) {
+        err = caught
+      }
+      should.not.exist(err)
+      configPostCount.should.equal(1)
+    })
   })
 
   describe('updateIndex', () => {
@@ -102,6 +123,32 @@ describe('HttpsTransport (characterization)', () => {
       should.exist(err)
       err.name.should.equal('InvalidStateError')
       err.message.should.equal('Conflict error.')
+    })
+  })
+
+  describe('revokeCapability', () => {
+    // Regression: when no `edvId` and no object `capability` are configured,
+    // the EDV ID is derived from the capability being revoked. This path
+    // previously called `this.parseEdvId(...)`, which does not exist on
+    // `HttpsTransport` (only on `EdvClient`), throwing
+    // "this.parseEdvId is not a function".
+    it('derives the edvId from the capability being revoked', async () => {
+      const transport = new HttpsTransport({ invocationSigner })
+      const parsedEdvId = `${BASE_URL}/edvs/parse-me`
+      const capabilityToRevoke = {
+        '@context': 'https://w3id.org/zcap/v1',
+        id: 'urn:uuid:revoke-me',
+        invocationTarget: `${parsedEdvId}/documents/doc-1`,
+        invoker: invocationSigner.id,
+        parentCapability: `urn:zcap:root:${encodeURIComponent(parsedEdvId)}`
+      }
+      let err: any
+      try {
+        await transport.revokeCapability({ capabilityToRevoke })
+      } catch (caught) {
+        err = caught
+      }
+      should.not.exist(err)
     })
   })
 

@@ -4,8 +4,14 @@
 import { assert, assertInvocationSigner } from './assert.js'
 import { DEFAULT_HEADERS, httpClient } from '@interop/http-client'
 import { signCapabilityInvocation } from '@interop/http-signature-zcap-invoke'
-import type { ISigner, IZcap } from '@interop/data-integrity-core'
+import type { ISigner } from '@interop/data-integrity-core'
 import { Transport } from './Transport.js'
+import {
+  getInvocationTarget,
+  parseEdvId,
+  ZCAP_ROOT_PREFIX,
+  type Capability
+} from './zcapUrls.js'
 import type {
   ITransportCreateEdvOptions,
   ITransportFindConfigsOptions,
@@ -19,19 +25,11 @@ import type {
   ITransportWriteOptions
 } from './Transport.js'
 
-const ZCAP_ROOT_PREFIX = 'urn:zcap:root:'
-
 /**
  * A node.js `https.Agent` instance used to handle HTTPS requests. Typed
  * loosely because it is an environment-specific (Node-only) object.
  */
-type HttpsAgent = any
-
-/**
- * The authorization capability (zcap) to invoke for an operation: either a
- * delegated/root zcap object or a root zcap URN string.
- */
-type Capability = IZcap | string
+export type HttpsAgent = any
 
 /**
  * Options for the `HttpsTransport` constructor.
@@ -43,6 +41,35 @@ export interface IHttpsTransportOptions {
   httpsAgent?: HttpsAgent
   invocationSigner?: ISigner
   url?: string
+}
+
+/**
+ * Options for the internal `_signedHttpGet` helper.
+ */
+interface ISignedHttpGetOptions {
+  url: string
+  capability?: Capability
+  notFoundMessage?: string
+}
+
+/**
+ * Options for the internal `_signedHttpPost` helper.
+ */
+interface ISignedHttpPostOptions {
+  url: string
+  json?: object
+  capability?: Capability
+  capabilityAction?: string
+  insert?: boolean
+}
+
+/**
+ * The shape of a `find` response body, narrowed from the raw HTTP response.
+ */
+interface IFindResult {
+  documents?: unknown[]
+  documentIds?: string[]
+  hasMore?: boolean
 }
 
 export class HttpsTransport extends Transport {
@@ -108,7 +135,7 @@ export class HttpsTransport extends Transport {
     let { capability, url } = this
     if (!url) {
       url =
-        HttpsTransport._getInvocationTarget({ capability }) ||
+        getInvocationTarget({ capability }) ||
         _createAbsoluteUrl('/edvs')
     }
 
@@ -145,7 +172,7 @@ export class HttpsTransport extends Transport {
     if (!(id || capability)) {
       throw new TypeError('"capability" is required if "id" was not provided.')
     }
-    const url = HttpsTransport._getInvocationTarget({ capability }) || id
+    const url = getInvocationTarget({ capability }) || id
 
     const { defaultHeaders, httpsAgent: agent, invocationSigner } = this
     if (!invocationSigner) {
@@ -177,7 +204,7 @@ export class HttpsTransport extends Transport {
           'to the HttpsTransport constructor.'
       )
     }
-    const url = HttpsTransport._getInvocationTarget({ capability }) || edvId
+    const url = getInvocationTarget({ capability }) || edvId
 
     const { defaultHeaders, httpsAgent: agent, invocationSigner } = this
     if (!invocationSigner) {
@@ -187,6 +214,7 @@ export class HttpsTransport extends Transport {
         json: config,
         agent
       })
+      return
     }
 
     // send request w/ zcap invocation
@@ -205,7 +233,7 @@ export class HttpsTransport extends Transport {
     let { capability, url } = this
     if (!url) {
       url =
-        HttpsTransport._getInvocationTarget({ capability }) ||
+        getInvocationTarget({ capability }) ||
         _createAbsoluteUrl('/edvs')
     }
 
@@ -290,7 +318,7 @@ export class HttpsTransport extends Transport {
   override async find({ query }: ITransportFindOptions = {}) {
     assert(query, 'query', 'object')
     const { capability, edvId } = this
-    let url = HttpsTransport._getInvocationTarget({ capability })
+    let url = getInvocationTarget({ capability })
     if (!url) {
       if (!edvId) {
         throw new Error('Either "capability" or "edvId" must be given.')
@@ -320,8 +348,8 @@ export class HttpsTransport extends Transport {
     if (query.count === true) {
       return response.data
     }
-    const { documents, documentIds, hasMore } = response.data as any
-    const result: any = {}
+    const { documents, documentIds, hasMore } = response.data as IFindResult
+    const result: IFindResult = {}
     if (documents) {
       result.documents = documents
     }
@@ -349,12 +377,12 @@ export class HttpsTransport extends Transport {
       // capability that is to be revoked -- presuming it is a document (if
       // revoking any other capability, the `edvId` must be set or a
       // `capability` passed to invoke)
-      edvId = (this as any).parseEdvId({ capability: capabilityToRevoke })
+      edvId = parseEdvId({ capability: capabilityToRevoke })
     }
 
     const revokePath = `${edvId}/zcaps/revocations`
     const url =
-      HttpsTransport._getInvocationTarget({ capability }) ||
+      getInvocationTarget({ capability }) ||
       `${revokePath}/${encodeURIComponent(capabilityToRevoke.id)}`
     if (!capability) {
       capability = `${ZCAP_ROOT_PREFIX}${encodeURIComponent(url)}`
@@ -403,7 +431,7 @@ export class HttpsTransport extends Transport {
     url,
     capability = this.capability,
     notFoundMessage
-  }: any = {}) {
+  }: ISignedHttpGetOptions) {
     if (!capability) {
       capability = this._rootZcapId
     }
@@ -438,7 +466,7 @@ export class HttpsTransport extends Transport {
     capability = this.capability,
     capabilityAction = 'write',
     insert
-  }: any = {}) {
+  }: ISignedHttpPostOptions) {
     if (!capability) {
       capability = this._rootZcapId
     }
@@ -482,7 +510,7 @@ export class HttpsTransport extends Transport {
       if (!capability) {
         throw new Error('Either "capability" or "edvId" must be given.')
       }
-      const target: any = HttpsTransport._getInvocationTarget({ capability })
+      const target: any = getInvocationTarget({ capability })
       // target is the entire documents collection
       if (target.endsWith('/documents')) {
         return `${target}/${id}`
@@ -492,35 +520,9 @@ export class HttpsTransport extends Transport {
     return `${this.edvId}/documents/${id}`
   }
 
+  // retained for backwards compatibility; delegates to the shared helper
   static _getInvocationTarget({ capability }: { capability?: Capability }) {
-    // no capability, so no invocation target
-    if (capability === undefined || capability === null) {
-      return null
-    }
-
-    let invocationTarget
-    if (typeof capability === 'string') {
-      if (!capability.startsWith(ZCAP_ROOT_PREFIX)) {
-        throw new Error(
-          'If "capability" is a string, it must be a root capability.'
-        )
-      }
-      invocationTarget = decodeURIComponent(
-        capability.substring(ZCAP_ROOT_PREFIX.length)
-      )
-    } else if (typeof capability === 'object') {
-      ;({ invocationTarget } = capability)
-    }
-
-    if (
-      !(typeof invocationTarget === 'string' && invocationTarget.includes(':'))
-    ) {
-      throw new TypeError(
-        '"invocationTarget" from capability must be an "https" URL.'
-      )
-    }
-
-    return invocationTarget
+    return getInvocationTarget({ capability })
   }
 }
 

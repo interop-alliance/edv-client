@@ -9,6 +9,7 @@ import type {
   ISigner
 } from '@interop/data-integrity-core'
 import { EdvClient } from './EdvClient.js'
+import { getInvocationTarget } from './zcapUrls.js'
 
 export class EdvDocument {
   id?: string
@@ -171,7 +172,7 @@ export class EdvDocument {
 }
 
 function _parseEdvDocId(capability: any) {
-  const target = EdvClient._getInvocationTarget({ capability })
+  const target = getInvocationTarget({ capability })
   if (!target) {
     throw new TypeError('"capability" must be an object.')
   }
