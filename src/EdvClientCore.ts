@@ -10,17 +10,143 @@ import {
 } from './assert.js'
 import { Cipher } from '@interop/minimal-cipher'
 import type {
+  IEDVConfig,
+  IEDVDocument,
   IHMAC,
   IKeyAgreementKey,
   IKeyResolver,
   IRecipientTemplate
 } from '@interop/data-integrity-core'
+import type { Transport } from './Transport.js'
 import { getRandomBytes } from './util.js'
 import { IndexHelper } from './IndexHelper.js'
 import { LegacyIndexHelperVersion1 } from './LegacyIndexHelperVersion1.js'
 
 // 1 MiB = 1048576
 const DEFAULT_CHUNK_SIZE = 1048576
+
+/**
+ * An `equals` attribute filter for `find` / `count`: either a single object of
+ * key/value attribute pairs to match, or an array of such objects. The names
+ * and values are HMAC-blinded by `IndexHelper` before being sent to the server.
+ */
+export type EqualsFilter =
+  | Record<string, unknown>
+  | Array<Record<string, unknown>>
+
+/**
+ * A `has` attribute filter for `find` / `count`: an attribute name, or an
+ * array of attribute names, that a document must possess to match.
+ */
+export type HasFilter = string | string[]
+
+/**
+ * Options for the `EdvClientCore` constructor.
+ */
+export interface IEdvClientCoreOptions {
+  hmac?: IHMAC
+  id?: string
+  keyAgreementKey?: IKeyAgreementKey
+  keyResolver?: IKeyResolver
+  cipherVersion?: 'recommended' | 'fips'
+  _attributeVersion?: number
+}
+
+/**
+ * Options for `ensureIndex`.
+ */
+export interface IEnsureIndexOptions {
+  attribute?: string | string[]
+  unique?: boolean
+}
+
+/**
+ * Options shared by the core document write methods (`insert` / `update`).
+ */
+export interface IWriteOptions {
+  doc?: IEDVDocument
+  stream?: ReadableStream
+  chunkSize?: number
+  recipients?: IRecipientTemplate[]
+  keyResolver?: IKeyResolver
+  keyAgreementKey?: IKeyAgreementKey
+  hmac?: IHMAC
+  transport?: Transport
+}
+
+/**
+ * Options for `updateIndex`.
+ */
+export interface IUpdateIndexOptions {
+  doc?: IEDVDocument
+  hmac?: IHMAC
+  transport?: Transport
+}
+
+/**
+ * Options for `delete`.
+ */
+export interface IDeleteOptions {
+  doc?: IEDVDocument
+  recipients?: IRecipientTemplate[]
+  keyResolver?: IKeyResolver
+  keyAgreementKey?: IKeyAgreementKey
+  transport?: Transport
+}
+
+/**
+ * Options for `get`.
+ */
+export interface IGetOptions {
+  id?: string
+  keyAgreementKey?: IKeyAgreementKey
+  transport?: Transport
+}
+
+/**
+ * Options for `getStream`.
+ */
+export interface IGetStreamOptions {
+  doc?: IEDVDocument
+  keyAgreementKey?: IKeyAgreementKey
+  transport?: Transport
+}
+
+/**
+ * Options for `count` and the attribute-matching portion of `find`.
+ */
+export interface ICountOptions {
+  keyAgreementKey?: IKeyAgreementKey
+  hmac?: IHMAC
+  equals?: EqualsFilter
+  has?: HasFilter
+  transport?: Transport
+}
+
+/**
+ * Options for `find`.
+ */
+export interface IFindOptions extends ICountOptions {
+  returnDocuments?: boolean
+  count?: boolean
+  limit?: number
+}
+
+/**
+ * Options for `getConfig`.
+ */
+export interface IGetConfigOptions {
+  id?: string
+  transport?: Transport
+}
+
+/**
+ * Options for `updateConfig`.
+ */
+export interface IUpdateConfigOptions {
+  config?: IEDVConfig
+  transport?: Transport
+}
 
 export class EdvClientCore {
   hmac?: IHMAC
@@ -56,7 +182,7 @@ export class EdvClientCore {
     keyResolver,
     cipherVersion = 'recommended',
     _attributeVersion = 2
-  }: any = {}) {
+  }: IEdvClientCoreOptions = {}) {
     if (id !== undefined) {
       assert(id, 'id', 'string')
     }
@@ -86,7 +212,7 @@ export class EdvClientCore {
    * @param {boolean} [options.unique=false] - Should be `true` if the index is
    *   considered unique, `false` if not.
    */
-  ensureIndex({ attribute, unique = false }: any = {}) {
+  ensureIndex({ attribute, unique = false }: IEnsureIndexOptions = {}) {
     this.indexHelper.ensureIndex({ attribute, unique, hmac: this.hmac })
   }
 
@@ -128,7 +254,7 @@ export class EdvClientCore {
     keyAgreementKey = this.keyAgreementKey,
     hmac = this.hmac,
     transport
-  }: any = {}) {
+  }: IWriteOptions = {}) {
     assertDocument(doc)
     assertTransport(transport)
 
@@ -221,7 +347,7 @@ export class EdvClientCore {
     keyAgreementKey = this.keyAgreementKey,
     hmac = this.hmac,
     transport
-  }: any = {}) {
+  }: IWriteOptions = {}) {
     assertDocument(doc)
     assertDocId(doc.id)
     assertTransport(transport)
@@ -293,7 +419,11 @@ export class EdvClientCore {
    *
    * @returns {Promise} - Resolves once the operation completes.
    */
-  async updateIndex({ doc, hmac = this.hmac, transport }: any = {}) {
+  async updateIndex({
+    doc,
+    hmac = this.hmac,
+    transport
+  }: IUpdateIndexOptions = {}) {
     assertDocument(doc)
     assertDocId(doc.id)
     assertTransport(transport)
@@ -330,7 +460,7 @@ export class EdvClientCore {
     keyResolver = this.keyResolver,
     keyAgreementKey = this.keyAgreementKey,
     transport
-  }: any = {}) {
+  }: IDeleteOptions = {}) {
     assertDocument(doc)
     assertDocId(doc.id)
     assertTransport(transport)
@@ -367,7 +497,7 @@ export class EdvClientCore {
     id,
     keyAgreementKey = this.keyAgreementKey,
     transport
-  }: any = {}) {
+  }: IGetOptions = {}) {
     assert(id, 'id', 'string')
     assertTransport(transport)
 
@@ -394,7 +524,7 @@ export class EdvClientCore {
     doc,
     keyAgreementKey = this.keyAgreementKey,
     transport
-  }: any = {}) {
+  }: IGetStreamOptions = {}) {
     assert(doc, 'doc', 'object')
     assertDocId(doc.id)
     assert(doc.stream, 'doc.stream', 'object')
@@ -408,7 +538,7 @@ export class EdvClientCore {
       async pull(controller) {
         // Note: user will call `read` on the decrypt stream... which will
         // trigger a pull here
-        if (chunkIndex >= state.chunks) {
+        if (chunkIndex >= (state.chunks as number)) {
           // done
           controller.close()
           return
@@ -419,7 +549,9 @@ export class EdvClientCore {
         controller.enqueue(chunk)
       }
     })
-    const decryptStream = await cipher.createDecryptStream({ keyAgreementKey })
+    const decryptStream = await cipher.createDecryptStream({
+      keyAgreementKey: keyAgreementKey as IKeyAgreementKey
+    })
     return stream.pipeThrough(decryptStream)
   }
 
@@ -448,7 +580,7 @@ export class EdvClientCore {
     equals,
     has,
     transport
-  }: any = {}) {
+  }: ICountOptions = {}) {
     const { count } = await EdvClientCore.prototype.find.call(this, {
       keyAgreementKey,
       hmac,
@@ -508,7 +640,7 @@ export class EdvClientCore {
     count = false,
     limit,
     transport
-  }: any = {}) {
+  }: IFindOptions = {}) {
     assertTransport(transport)
     _checkIndexing(hmac)
     if (
@@ -567,7 +699,7 @@ export class EdvClientCore {
    *
    * @returns {Promise<object>} - Resolves to the configuration for the EDV.
    */
-  async getConfig({ id, transport }: any = {}) {
+  async getConfig({ id, transport }: IGetConfigOptions = {}) {
     assertTransport(transport)
     return transport.getConfig({ id })
   }
@@ -583,7 +715,7 @@ export class EdvClientCore {
    *
    * @returns {Promise} - Resolves once the operation completes.
    */
-  async updateConfig({ config, transport }: any = {}) {
+  async updateConfig({ config, transport }: IUpdateConfigOptions = {}) {
     assertTransport(transport)
 
     if (!(config && typeof config === 'object')) {
@@ -619,7 +751,9 @@ export class EdvClientCore {
   }
 
   // helper to create default recipients
-  _createDefaultRecipients(keyAgreementKey: IKeyAgreementKey): IRecipientTemplate[] {
+  _createDefaultRecipients(
+    keyAgreementKey: IKeyAgreementKey
+  ): IRecipientTemplate[] {
     return keyAgreementKey
       ? [
           {

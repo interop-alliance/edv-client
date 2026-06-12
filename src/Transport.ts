@@ -1,6 +1,92 @@
 /*!
  * Copyright (c) 2022 Digital Bazaar, Inc. All rights reserved.
  */
+import type {
+  IEDVChunk,
+  IEDVConfig,
+  IEDVQuery,
+  IEncryptedDocument,
+  IIndexEntry,
+  IZcap
+} from '@interop/data-integrity-core'
+
+/**
+ * Options for `createEdv`.
+ */
+export interface ITransportCreateEdvOptions {
+  url?: string
+  config?: IEDVConfig
+}
+
+/**
+ * Options for `getConfig` and `get` (both keyed by an ID).
+ */
+export interface ITransportGetByIdOptions {
+  id?: string
+}
+
+/**
+ * Options for `updateConfig`.
+ */
+export interface ITransportUpdateConfigOptions {
+  config?: IEDVConfig
+}
+
+/**
+ * Options for `findConfigs`.
+ */
+export interface ITransportFindConfigsOptions {
+  controller?: string
+  referenceId?: string
+  after?: string
+  limit?: number
+}
+
+/**
+ * Options for `insert` / `update` (both send an encrypted document).
+ */
+export interface ITransportWriteOptions {
+  encrypted?: IEncryptedDocument
+}
+
+/**
+ * Options for `updateIndex`.
+ */
+export interface ITransportUpdateIndexOptions {
+  docId?: string
+  entry?: IIndexEntry
+}
+
+/**
+ * Options for `find`.
+ */
+export interface ITransportFindOptions {
+  query?: IEDVQuery
+}
+
+/**
+ * Options for `revokeCapability`.
+ */
+export interface ITransportRevokeCapabilityOptions {
+  capabilityToRevoke?: IZcap
+}
+
+/**
+ * Options for `storeChunk`.
+ */
+export interface ITransportStoreChunkOptions {
+  docId?: string
+  chunk?: IEDVChunk
+}
+
+/**
+ * Options for `getChunk`.
+ */
+export interface ITransportGetChunkOptions {
+  docId?: string
+  chunkIndex?: number
+}
+
 export class Transport {
   /**
    * Creates a Transport layer for an EDV client.
@@ -19,10 +105,14 @@ export class Transport {
    * @returns {Promise<object>} - Resolves to the configuration for the newly
    *   created EDV.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async createEdv({ url, config }: any = {}): Promise<any> {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  async createEdv({
+    url,
+    config
+  }: ITransportCreateEdvOptions = {}): Promise<any> {
     _throwNotImplemented()
   }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   /**
    * Gets the configuration for an EDV from the server.
@@ -33,7 +123,7 @@ export class Transport {
    * @returns {Promise<object>} - Resolves to the configuration for the EDV.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getConfig({ id }: any = {}): Promise<any> {
+  async getConfig({ id }: ITransportGetByIdOptions = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -47,10 +137,13 @@ export class Transport {
    *
    * @returns {Promise<void>} - Settles once the operation completes.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async updateConfig({ config }: any = {}): Promise<any> {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  async updateConfig({
+    config
+  }: ITransportUpdateConfigOptions = {}): Promise<any> {
     _throwNotImplemented()
   }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   /**
    * Get all EDV configurations matching a query.
@@ -69,7 +162,7 @@ export class Transport {
     referenceId,
     after,
     limit
-  }: any = {}): Promise<any> {
+  }: ITransportFindConfigsOptions = {}): Promise<any> {
     _throwNotImplemented()
   }
   /* eslint-enable @typescript-eslint/no-unused-vars */
@@ -85,7 +178,7 @@ export class Transport {
    * @returns {Promise} - Settles once the operation completes.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async insert({ encrypted }: any = {}): Promise<any> {
+  async insert({ encrypted }: ITransportWriteOptions = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -100,7 +193,7 @@ export class Transport {
    * @returns {Promise} - Settles once the operation completes.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async update({ encrypted }: any = {}): Promise<any> {
+  async update({ encrypted }: ITransportWriteOptions = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -119,10 +212,14 @@ export class Transport {
    *
    * @returns {Promise} - Settles once the operation completes.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async updateIndex({ docId, entry }: any = {}): Promise<any> {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  async updateIndex({
+    docId,
+    entry
+  }: ITransportUpdateIndexOptions = {}): Promise<any> {
     _throwNotImplemented()
   }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   /**
    * Gets an encrypted document from an EDV server by its ID.
@@ -133,7 +230,7 @@ export class Transport {
    * @returns {Promise<object>} - Resolves to the encrypted document.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async get({ id }: any = {}): Promise<any> {
+  async get({ id }: ITransportGetByIdOptions = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -148,7 +245,7 @@ export class Transport {
    *   `{documents: [...]}` or `{count: docCount}` if `query.count === true`.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async find({ query }: any = {}): Promise<any> {
+  async find({ query }: ITransportFindOptions = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -160,10 +257,13 @@ export class Transport {
    *
    * @returns {Promise<object>} Resolves once the operation completes.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async revokeCapability({ capabilityToRevoke }: any = {}): Promise<any> {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  async revokeCapability({
+    capabilityToRevoke
+  }: ITransportRevokeCapabilityOptions = {}): Promise<any> {
     _throwNotImplemented()
   }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   /**
    * Sends an encrypted document chunk to an EDV server.
@@ -174,10 +274,14 @@ export class Transport {
    *
    * @returns {Promise} - Settles once the operation completes.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async storeChunk({ docId, chunk }: any): Promise<any> {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  async storeChunk({
+    docId,
+    chunk
+  }: ITransportStoreChunkOptions): Promise<any> {
     _throwNotImplemented()
   }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   /**
    * Gets an encrypted document chunk from an EDV server.
@@ -188,10 +292,14 @@ export class Transport {
    *
    * @returns {Promise<object>} - Resolves to the chunk data.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getChunk({ docId, chunkIndex }: any = {}): Promise<any> {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  async getChunk({
+    docId,
+    chunkIndex
+  }: ITransportGetChunkOptions = {}): Promise<any> {
     _throwNotImplemented()
   }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 }
 
 function _throwNotImplemented() {
