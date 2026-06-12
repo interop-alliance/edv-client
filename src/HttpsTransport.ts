@@ -447,7 +447,7 @@ export class HttpsTransport {
         )
       }
       invocationTarget = decodeURIComponent(
-        capability.substring(ZCAP_ROOT_PREFIX as any)
+        capability.substring(ZCAP_ROOT_PREFIX.length)
       )
     } else if (typeof capability === 'object') {
       ;({ invocationTarget } = capability)

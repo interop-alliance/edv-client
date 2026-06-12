@@ -5,14 +5,14 @@ import type {
   IHMAC,
   IKeyAgreementKey,
   IKeyResolver,
-  IRecipient,
+  IRecipientTemplate,
   ISigner
 } from '@interop/data-integrity-core'
 import { EdvClient } from './EdvClient.js'
 
 export class EdvDocument {
   id?: string
-  recipients: IRecipient[]
+  recipients: IRecipientTemplate[]
   keyResolver?: IKeyResolver
   keyAgreementKey?: IKeyAgreementKey
   hmac?: IHMAC

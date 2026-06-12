@@ -1,5 +1,27 @@
 # @interop/edv-client ChangeLog
 
+## 17.1.0 - TBD
+
+### Fixed
+
+- `HttpsTransport._getInvocationTarget()` now strips the `urn:zcap:root:` prefix
+  from a string root zcap and returns the bare invocation target URL. It
+  previously called `substring(ZCAP_ROOT_PREFIX)` (a string, coerced to
+  `NaN` -> `0`) instead of `substring(ZCAP_ROOT_PREFIX.length)`, so the prefix
+  was left in place. This affected operations that derive their request URL via
+  `_getInvocationTarget` (notably `find`) when passed a string root zcap as the
+  `capability`; document-level operations were unaffected because `_getDocUrl`
+  short-circuits on `edvId`.
+
+### Changed
+
+- Type pre-encryption recipient inputs as `IRecipientTemplate` (from
+  `@interop/data-integrity-core`) rather than `IRecipient`:
+  `EdvDocument.recipients` and `_createDefaultRecipients()` now use the template
+  type, since the `encrypted_key` is added during encryption. No public API or
+  behavior change. Requires `@interop/data-integrity-core@^8.0.0` (via
+  `@interop/minimal-cipher`).
+
 ## 17.0.0-17.0.1 - 2026-06-08
 
 ### Changed
