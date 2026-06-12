@@ -3,9 +3,185 @@
  */
 import { assert, assertInvocationSigner } from './assert.js'
 import { DEFAULT_HEADERS } from '@interop/http-client'
-import type { ISigner } from '@interop/data-integrity-core'
+import type {
+  IEDVConfig,
+  IEDVDocument,
+  IHMAC,
+  IKeyAgreementKey,
+  IKeyResolver,
+  IRecipientTemplate,
+  ISigner,
+  IZcap
+} from '@interop/data-integrity-core'
 import { EdvClientCore } from './EdvClientCore.js'
+import type { EqualsFilter, HasFilter } from './EdvClientCore.js'
 import { HttpsTransport } from './HttpsTransport.js'
+
+/**
+ * A node.js `https.Agent` instance used to handle HTTPS requests. Typed
+ * loosely because it is an environment-specific (Node-only) object.
+ */
+type HttpsAgent = any
+
+/**
+ * The authorization capability (zcap) to invoke for an operation: either a
+ * delegated/root zcap object or a root zcap URN string.
+ */
+type Capability = IZcap | string
+
+/**
+ * Options shared by every method that authorizes an EDV operation with a zcap
+ * invocation.
+ */
+export interface IZcapAuthOptions {
+  capability?: Capability
+  invocationSigner?: ISigner
+}
+
+/**
+ * Options for the `EdvClient` constructor.
+ */
+export interface IEdvClientOptions {
+  capability?: Capability
+  defaultHeaders?: Record<string, string>
+  hmac?: IHMAC
+  id?: string
+  invocationSigner?: ISigner
+  httpsAgent?: HttpsAgent
+  keyAgreementKey?: IKeyAgreementKey
+  keyResolver?: IKeyResolver
+  cipherVersion?: 'recommended' | 'fips'
+  _attributeVersion?: number
+}
+
+/**
+ * Options for `insert` / `update`.
+ */
+export interface IClientWriteOptions extends IZcapAuthOptions {
+  doc?: IEDVDocument
+  stream?: ReadableStream
+  chunkSize?: number
+  recipients?: IRecipientTemplate[]
+  keyResolver?: IKeyResolver
+  keyAgreementKey?: IKeyAgreementKey
+  hmac?: IHMAC
+}
+
+/**
+ * Options for `updateIndex`.
+ */
+export interface IClientUpdateIndexOptions extends IZcapAuthOptions {
+  doc?: IEDVDocument
+  hmac?: IHMAC
+}
+
+/**
+ * Options for `delete`.
+ */
+export interface IClientDeleteOptions extends IZcapAuthOptions {
+  doc?: IEDVDocument
+  recipients?: IRecipientTemplate[]
+  keyResolver?: IKeyResolver
+  keyAgreementKey?: IKeyAgreementKey
+}
+
+/**
+ * Options for `get`.
+ */
+export interface IClientGetOptions extends IZcapAuthOptions {
+  id?: string
+  keyAgreementKey?: IKeyAgreementKey
+}
+
+/**
+ * Options for `getStream`.
+ */
+export interface IClientGetStreamOptions extends IZcapAuthOptions {
+  doc?: IEDVDocument
+  keyAgreementKey?: IKeyAgreementKey
+}
+
+/**
+ * Options for `count` and the attribute-matching portion of `find`.
+ */
+export interface IClientCountOptions extends IZcapAuthOptions {
+  keyAgreementKey?: IKeyAgreementKey
+  hmac?: IHMAC
+  equals?: EqualsFilter
+  has?: HasFilter
+}
+
+/**
+ * Options for `find`.
+ */
+export interface IClientFindOptions extends IClientCountOptions {
+  returnDocuments?: boolean
+  count?: boolean
+  limit?: number
+}
+
+/**
+ * Options for `getConfig`.
+ */
+export interface IClientGetConfigOptions extends IZcapAuthOptions {
+  id?: string
+  headers?: Record<string, string>
+}
+
+/**
+ * Options for `updateConfig`.
+ */
+export interface IClientUpdateConfigOptions extends IZcapAuthOptions {
+  config?: IEDVConfig
+  headers?: Record<string, string>
+}
+
+/**
+ * Options for `revokeCapability`.
+ */
+export interface IRevokeCapabilityOptions extends IZcapAuthOptions {
+  capabilityToRevoke?: IZcap
+}
+
+/**
+ * Options for `parseEdvId` and the static invocation-target helpers.
+ */
+export interface IParseEdvIdOptions {
+  capability?: Capability
+}
+
+/**
+ * Options for the static `createEdv`.
+ */
+export interface ICreateEdvOptions extends IZcapAuthOptions {
+  url?: string
+  config?: IEDVConfig
+  httpsAgent?: HttpsAgent
+  headers?: Record<string, string>
+}
+
+/**
+ * Options for the static `findConfig` / `findConfigs`.
+ */
+export interface IFindConfigsOptions extends IZcapAuthOptions {
+  url?: string
+  controller?: string
+  referenceId?: string
+  after?: string
+  limit?: number
+  httpsAgent?: HttpsAgent
+  headers?: Record<string, string>
+}
+
+/**
+ * Options for the static `_migrate` helper.
+ */
+export interface IMigrateOptions {
+  from?: EdvClient
+  to?: EdvClient
+  equals?: EqualsFilter
+  has?: HasFilter
+}
 
 /**
  * Note: An Encrypted Data Vault (EDV) server MUST expose an HTTPS API with a
@@ -19,10 +195,10 @@ import { HttpsTransport } from './HttpsTransport.js'
  */
 
 export class EdvClient extends EdvClientCore {
-  capability: any
+  capability?: Capability
   invocationSigner?: ISigner
-  httpsAgent: any
-  defaultHeaders: any
+  httpsAgent?: HttpsAgent
+  defaultHeaders: Record<string, string>
 
   /**
    * Creates a new EdvClient for connecting to an Encrypted Data Vault (EDV).
@@ -67,7 +243,7 @@ export class EdvClient extends EdvClientCore {
     keyResolver,
     cipherVersion = 'recommended',
     _attributeVersion
-  }: any = {}) {
+  }: IEdvClientOptions = {}) {
     if (capability !== undefined) {
       assert(capability, 'capability', 'object')
       if (!id) {
@@ -134,7 +310,7 @@ export class EdvClient extends EdvClientCore {
     hmac = this.hmac,
     capability = this.capability,
     invocationSigner = this.invocationSigner
-  }: any = {}) {
+  }: IClientWriteOptions = {}) {
     assertInvocationSigner(invocationSigner)
     const { defaultHeaders, httpsAgent, id: edvId } = this
     const transport = new HttpsTransport({
@@ -194,7 +370,7 @@ export class EdvClient extends EdvClientCore {
     hmac = this.hmac,
     capability = this.capability,
     invocationSigner = this.invocationSigner
-  }: any = {}) {
+  }: IClientWriteOptions = {}) {
     assertInvocationSigner(invocationSigner)
     const { defaultHeaders, httpsAgent, id: edvId } = this
     const transport = new HttpsTransport({
@@ -237,7 +413,7 @@ export class EdvClient extends EdvClientCore {
     hmac = this.hmac,
     capability = this.capability,
     invocationSigner = this.invocationSigner
-  }: any = {}) {
+  }: IClientUpdateIndexOptions = {}) {
     assertInvocationSigner(invocationSigner)
     const { defaultHeaders, httpsAgent, id: edvId } = this
     const transport = new HttpsTransport({
@@ -280,7 +456,7 @@ export class EdvClient extends EdvClientCore {
     invocationSigner = this.invocationSigner,
     keyResolver = this.keyResolver,
     keyAgreementKey = this.keyAgreementKey
-  }: any = {}) {
+  }: IClientDeleteOptions = {}) {
     assertInvocationSigner(invocationSigner)
     const { defaultHeaders, httpsAgent, id: edvId } = this
     const transport = new HttpsTransport({
@@ -320,7 +496,7 @@ export class EdvClient extends EdvClientCore {
     keyAgreementKey = this.keyAgreementKey,
     capability = this.capability,
     invocationSigner = this.invocationSigner
-  }: any = {}) {
+  }: IClientGetOptions = {}) {
     assertInvocationSigner(invocationSigner)
     const { defaultHeaders, httpsAgent, id: edvId } = this
     const transport = new HttpsTransport({
@@ -355,7 +531,7 @@ export class EdvClient extends EdvClientCore {
     keyAgreementKey = this.keyAgreementKey,
     capability = this.capability,
     invocationSigner = this.invocationSigner
-  }: any = {}) {
+  }: IClientGetStreamOptions = {}) {
     assertInvocationSigner(invocationSigner)
     const { defaultHeaders, httpsAgent, id: edvId } = this
     const transport = new HttpsTransport({
@@ -398,7 +574,7 @@ export class EdvClient extends EdvClientCore {
     has,
     capability = this.capability,
     invocationSigner = this.invocationSigner
-  }: any = {}) {
+  }: IClientCountOptions = {}) {
     assertInvocationSigner(invocationSigner)
     const { defaultHeaders, httpsAgent, id: edvId } = this
     const transport = new HttpsTransport({
@@ -452,7 +628,7 @@ export class EdvClient extends EdvClientCore {
     returnDocuments,
     count = false,
     limit
-  }: any = {}) {
+  }: IClientFindOptions = {}) {
     assertInvocationSigner(invocationSigner)
     const { defaultHeaders, httpsAgent, id: edvId } = this
     const transport = new HttpsTransport({
@@ -478,6 +654,8 @@ export class EdvClient extends EdvClientCore {
    * @inheritdoc
    *
    * @param {object} options - The options to use.
+   * @param {string} [options.id] - The ID of the EDV config; defaults to the
+   *   client's configured EDV ID.
    * @param {object|string} [options.capability=this.capability] - The
    *   authorization capability (zcap) to use to authorize the operation.
    * @param {object} [options.headers] - An optional
@@ -489,10 +667,11 @@ export class EdvClient extends EdvClientCore {
    * @returns {Promise<object>} - Resolves to the configuration for the EDV.
    */
   async getConfig({
+    id,
     capability = this.capability,
     headers,
     invocationSigner = this.invocationSigner
-  }: any = {}) {
+  }: IClientGetConfigOptions = {}) {
     const { defaultHeaders, httpsAgent, id: edvId } = this
     const transport = new HttpsTransport({
       capability,
@@ -501,7 +680,7 @@ export class EdvClient extends EdvClientCore {
       httpsAgent,
       invocationSigner
     })
-    return super.getConfig({ transport })
+    return super.getConfig({ id, transport })
   }
 
   /**
@@ -524,7 +703,7 @@ export class EdvClient extends EdvClientCore {
     capability = this.capability,
     headers,
     invocationSigner = this.invocationSigner
-  }: any = {}) {
+  }: IClientUpdateConfigOptions = {}) {
     assertInvocationSigner(invocationSigner)
     const { defaultHeaders, httpsAgent, id: edvId } = this
     const transport = new HttpsTransport({
@@ -554,7 +733,7 @@ export class EdvClient extends EdvClientCore {
     capabilityToRevoke,
     capability,
     invocationSigner
-  }: any = {}) {
+  }: IRevokeCapabilityOptions = {}) {
     assertInvocationSigner(invocationSigner)
     const { defaultHeaders, httpsAgent, id: edvId } = this
     const transport = new HttpsTransport({
@@ -577,7 +756,7 @@ export class EdvClient extends EdvClientCore {
    *
    * @returns {string} - The ID of the EDV.
    */
-  parseEdvId({ capability }: any = {}) {
+  parseEdvId({ capability }: IParseEdvIdOptions = {}) {
     return EdvClient._parseEdvId({ capability })
   }
 
@@ -606,7 +785,7 @@ export class EdvClient extends EdvClientCore {
     httpsAgent,
     headers,
     invocationSigner
-  }: any = {}) {
+  }: ICreateEdvOptions = {}) {
     const transport = new HttpsTransport({
       url,
       capability,
@@ -644,7 +823,7 @@ export class EdvClient extends EdvClientCore {
     invocationSigner,
     headers,
     capability
-  }: any = {}) {
+  }: IFindConfigsOptions = {}) {
     const results: any = await this.findConfigs({
       url,
       controller,
@@ -687,7 +866,7 @@ export class EdvClient extends EdvClientCore {
     headers,
     capability,
     invocationSigner
-  }: any = {}) {
+  }: IFindConfigsOptions = {}) {
     const transport = new HttpsTransport({
       url,
       capability,
@@ -737,7 +916,7 @@ export class EdvClient extends EdvClientCore {
    *
    * @returns {Promise} Resolves once the operation completes.
    */
-  static async _migrate({ from, to, equals, has }: any = {}) {
+  static async _migrate({ from, to, equals, has }: IMigrateOptions = {}) {
     assert(from, 'from', 'object')
     assert(to, 'to', 'object')
 
@@ -769,7 +948,7 @@ export class EdvClient extends EdvClientCore {
    *
    * @returns {string} - The ID of the EDV.
    */
-  static _parseEdvId({ capability }: any = {}) {
+  static _parseEdvId({ capability }: IParseEdvIdOptions = {}) {
     const invocationTarget: any = EdvClient._getInvocationTarget({ capability })
     const start = invocationTarget.lastIndexOf('/edvs/')
     if (start === -1) {
@@ -786,7 +965,7 @@ export class EdvClient extends EdvClientCore {
 
   // provided temporarily for backwards compatibility; should be moved to
   // a separate helpers file
-  static _getInvocationTarget({ capability }: any) {
+  static _getInvocationTarget({ capability }: IParseEdvIdOptions) {
     return HttpsTransport._getInvocationTarget({ capability })
   }
 }

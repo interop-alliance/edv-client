@@ -6,9 +6,9 @@
 
 - `HttpsTransport._getInvocationTarget()` now strips the `urn:zcap:root:` prefix
   from a string root zcap and returns the bare invocation target URL. It
-  previously called `substring(ZCAP_ROOT_PREFIX)` (a string, coerced to
-  `NaN` -> `0`) instead of `substring(ZCAP_ROOT_PREFIX.length)`, so the prefix
-  was left in place. This affected operations that derive their request URL via
+  previously called `substring(ZCAP_ROOT_PREFIX)` (a string, coerced to `NaN` ->
+  `0`) instead of `substring(ZCAP_ROOT_PREFIX.length)`, so the prefix was left
+  in place. This affected operations that derive their request URL via
   `_getInvocationTarget` (notably `find`) when passed a string root zcap as the
   `capability`; document-level operations were unaffected because `_getDocUrl`
   short-circuits on `edvId`.
@@ -26,6 +26,15 @@
   type, since the `encrypted_key` is added during encryption. No public API or
   behavior change. Requires `@interop/data-integrity-core@^8.0.0` (via
   `@interop/minimal-cipher`).
+- Replace the `any`-typed options parameter on every public method of
+  `EdvClient`, `EdvClientCore`, `Transport`, and `HttpsTransport` with named
+  option interfaces (e.g. `IWriteOptions`, `IClientFindOptions`,
+  `ITransportWriteOptions`), built on the shared `@interop/data-integrity-core`
+  types. The `assert*` validators are now TypeScript assertion functions, so a
+  runtime check (e.g. `assertTransport`, `assertDocument`) also narrows the
+  value's type. No runtime behavior change for existing callers. `EdvClient`'s
+  `getConfig()` now also accepts an optional `id` (defaulting to the client's
+  EDV ID), forwarded to the transport.
 
 ## 17.0.0-17.0.1 - 2026-06-08
 

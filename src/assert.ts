@@ -2,9 +2,14 @@
  * Copyright (c) 2022 Digital Bazaar, Inc. All rights reserved.
  */
 import { base58btc } from './baseX.js'
+import type { IEDVDocument, ISigner } from '@interop/data-integrity-core'
 import { Transport } from './Transport.js'
 
-export function assert(variable: any, name: string, types: string | string[]) {
+export function assert<T>(
+  variable: T,
+  name: string,
+  types: string | string[]
+): asserts variable is NonNullable<T> {
   if (!Array.isArray(types)) {
     types = [types]
   }
@@ -25,7 +30,7 @@ export function assert(variable: any, name: string, types: string | string[]) {
   }
 }
 
-export function assertDocument(doc: any) {
+export function assertDocument(doc: any): asserts doc is IEDVDocument {
   assert(doc, 'doc', 'object')
   const { id, content, meta = {}, stream } = doc
   if (id !== undefined) {
@@ -38,7 +43,7 @@ export function assertDocument(doc: any) {
   }
 }
 
-export function assertDocId(id: any) {
+export function assertDocId(id: any): asserts id is string {
   try {
     // verify ID is multibase base58-encoded 16 bytes
     const buf = base58btc.decode(id.substr(1))
@@ -63,14 +68,18 @@ export function assertDocId(id: any) {
   }
 }
 
-export function assertInvocationSigner(invocationSigner: any) {
+export function assertInvocationSigner(
+  invocationSigner: any
+): asserts invocationSigner is ISigner {
   assert(invocationSigner, 'invocationSigner', 'object')
   const { id, sign } = invocationSigner
   assert(id, 'invocationSigner.id', 'string')
   assert(sign, 'invocationSigner.sign', 'function')
 }
 
-export function assertTransport(transport: any) {
+export function assertTransport(
+  transport: any
+): asserts transport is Transport {
   assert(transport, 'transport', 'object')
   if (!(transport instanceof Transport)) {
     throw new TypeError('"transport" must be a Transport instance.')

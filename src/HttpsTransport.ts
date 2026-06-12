@@ -4,18 +4,58 @@
 import { assert, assertInvocationSigner } from './assert.js'
 import { DEFAULT_HEADERS, httpClient } from '@interop/http-client'
 import { signCapabilityInvocation } from '@interop/http-signature-zcap-invoke'
+import type { ISigner, IZcap } from '@interop/data-integrity-core'
 import { Transport } from './Transport.js'
+import type {
+  ITransportCreateEdvOptions,
+  ITransportFindConfigsOptions,
+  ITransportFindOptions,
+  ITransportGetByIdOptions,
+  ITransportGetChunkOptions,
+  ITransportRevokeCapabilityOptions,
+  ITransportStoreChunkOptions,
+  ITransportUpdateConfigOptions,
+  ITransportUpdateIndexOptions,
+  ITransportWriteOptions
+} from './Transport.js'
 
 const ZCAP_ROOT_PREFIX = 'urn:zcap:root:'
 
+/**
+ * A node.js `https.Agent` instance used to handle HTTPS requests. Typed
+ * loosely because it is an environment-specific (Node-only) object.
+ */
+type HttpsAgent = any
+
+/**
+ * The authorization capability (zcap) to invoke for an operation: either a
+ * delegated/root zcap object or a root zcap URN string.
+ */
+type Capability = IZcap | string
+
+/**
+ * Options for the `HttpsTransport` constructor.
+ */
+export interface IHttpsTransportOptions {
+  capability?: Capability
+  defaultHeaders?: Record<string, string>
+  edvId?: string
+  httpsAgent?: HttpsAgent
+  invocationSigner?: ISigner
+  url?: string
+}
+
 export class HttpsTransport extends Transport {
-  capability: any
-  defaultHeaders: any
+  capability?: Capability
+  defaultHeaders: Record<string, string>
+  // `edvId` and `url` are URL-building plumbing passed through to the HTTP
+  // client and URL helpers; kept loose to avoid threading nullability casts
+  // through every request path.
   edvId: any
-  httpsAgent: any
-  invocationSigner: any
+  httpsAgent?: HttpsAgent
+  invocationSigner?: ISigner
   url: any
-  _rootZcapId: any
+  _rootZcapId?: string
 
   /**
    * Creates a transport layer for an EDV client to use to perform an
@@ -42,7 +82,7 @@ export class HttpsTransport extends Transport {
     httpsAgent,
     invocationSigner,
     url
-  }: any = {}) {
+  }: IHttpsTransportOptions = {}) {
     super()
     if (url !== undefined) {
       assert(url, 'url', 'string')
@@ -64,7 +104,7 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async createEdv({ config }: any = {}) {
+  override async createEdv({ config }: ITransportCreateEdvOptions = {}) {
     let { capability, url } = this
     if (!url) {
       url =
@@ -100,7 +140,7 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async getConfig({ id = this.edvId }: any = {}) {
+  override async getConfig({ id = this.edvId }: ITransportGetByIdOptions = {}) {
     const { capability } = this
     if (!(id || capability)) {
       throw new TypeError('"capability" is required if "id" was not provided.')
@@ -129,7 +169,7 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async updateConfig({ config }: any = {}) {
+  override async updateConfig({ config }: ITransportUpdateConfigOptions = {}) {
     const { capability, edvId } = this
     if (!(edvId || capability)) {
       throw new TypeError(
@@ -156,7 +196,12 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async findConfigs({ controller, referenceId, after, limit }: any = {}) {
+  override async findConfigs({
+    controller,
+    referenceId,
+    after,
+    limit
+  }: ITransportFindConfigsOptions = {}) {
     let { capability, url } = this
     if (!url) {
       url =
@@ -166,10 +211,10 @@ export class HttpsTransport extends Transport {
 
     // eliminate undefined properties, to prevent expression of them using
     // the string literal `undefined`
-    const searchParams = Object.fromEntries(
-      Object.entries({ controller, referenceId, after, limit }).filter(
-        ([, v]) => v !== undefined
-      )
+    const searchParams: Record<string, string> = Object.fromEntries(
+      Object.entries({ controller, referenceId, after, limit })
+        .filter(([, value]) => value !== undefined)
+        .map(([key, value]) => [key, String(value)])
     )
 
     // no invocationSigner was provided, submit the request without a zCap
@@ -197,7 +242,8 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async insert({ encrypted }: any = {}) {
+  override async insert({ encrypted }: ITransportWriteOptions = {}) {
+    assert(encrypted, 'encrypted', 'object')
     // trim document ID and trailing slash to post to `/documents`
     let url = this._getDocUrl(encrypted.id, this.capability)
     if (url.endsWith(encrypted.id)) {
@@ -209,7 +255,8 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async update({ encrypted }: any = {}) {
+  override async update({ encrypted }: ITransportWriteOptions = {}) {
+    assert(encrypted, 'encrypted', 'object')
     const url = this._getDocUrl(encrypted.id, this.capability)
     await this._signedHttpPost({ url, json: encrypted, insert: false })
   }
@@ -217,7 +264,10 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async updateIndex({ docId, entry }: any = {}) {
+  override async updateIndex({
+    docId,
+    entry
+  }: ITransportUpdateIndexOptions = {}) {
     const url = this._getDocUrl(docId, this.capability) + '/index'
     await this._signedHttpPost({ url, json: entry, insert: false })
   }
@@ -225,7 +275,7 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async get({ id }: any = {}) {
+  override async get({ id }: ITransportGetByIdOptions = {}) {
     const url = this._getDocUrl(id, this.capability)
     const response = await this._signedHttpGet({
       url,
@@ -237,7 +287,8 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async find({ query }: any = {}) {
+  override async find({ query }: ITransportFindOptions = {}) {
+    assert(query, 'query', 'object')
     const { capability, edvId } = this
     let url = HttpsTransport._getInvocationTarget({ capability })
     if (!url) {
@@ -256,7 +307,7 @@ export class HttpsTransport extends Transport {
     if (query.returnDocuments !== undefined) {
       const { returnDocuments, ...rest } = query
       query = rest
-      url += `?${new URLSearchParams({ returnDocuments })}`
+      url += `?${new URLSearchParams({ returnDocuments: String(returnDocuments) })}`
     }
 
     // do signed HTTP post w/'read' action
@@ -286,7 +337,9 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async revokeCapability({ capabilityToRevoke }: any = {}) {
+  override async revokeCapability({
+    capabilityToRevoke
+  }: ITransportRevokeCapabilityOptions = {}) {
     assert(capabilityToRevoke, 'capabilityToRevoke', 'object')
 
     let { edvId, capability } = this
@@ -317,7 +370,8 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async storeChunk({ docId, chunk }: any) {
+  override async storeChunk({ docId, chunk }: ITransportStoreChunkOptions) {
+    assert(chunk, 'chunk', 'object')
     // append `/chunks/<chunkIndex>`
     const { index } = chunk
     const url = this._getDocUrl(docId, this.capability) + `/chunks/${index}`
@@ -327,7 +381,10 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async getChunk({ docId, chunkIndex }: any = {}) {
+  override async getChunk({
+    docId,
+    chunkIndex
+  }: ITransportGetChunkOptions = {}) {
     // append `/chunks/<chunkIndex>`
     const url =
       this._getDocUrl(docId, this.capability) + `/chunks/${chunkIndex}`
@@ -358,7 +415,7 @@ export class HttpsTransport extends Transport {
         method: 'get',
         headers: defaultHeaders,
         capability,
-        invocationSigner,
+        invocationSigner: invocationSigner as ISigner,
         capabilityAction: 'read'
       })
       // send request
@@ -394,7 +451,7 @@ export class HttpsTransport extends Transport {
         headers: defaultHeaders,
         json,
         capability,
-        invocationSigner,
+        invocationSigner: invocationSigner as ISigner,
         capabilityAction
       })
 
@@ -435,7 +492,7 @@ export class HttpsTransport extends Transport {
     return `${this.edvId}/documents/${id}`
   }
 
-  static _getInvocationTarget({ capability }: any) {
+  static _getInvocationTarget({ capability }: { capability?: Capability }) {
     // no capability, so no invocation target
     if (capability === undefined || capability === null) {
       return null
