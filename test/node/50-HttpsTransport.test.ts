@@ -11,7 +11,8 @@
  * comment rather than silently encoding it as correct.
  */
 import { BASE_URL, default as mock } from './mock.js'
-import { HttpsTransport } from '../../src/index.js'
+import { HttpsTransport, Transport } from '../../src/index.js'
+import { assertTransport } from '../../src/assert.js'
 
 describe('HttpsTransport (characterization)', () => {
   let invocationSigner: any = null
@@ -232,6 +233,47 @@ describe('HttpsTransport (characterization)', () => {
       transport
         ._getDocUrl('doc-1', undefined)
         .should.equal(`${edvId}/documents/doc-1`)
+    })
+  })
+
+  describe('Transport inheritance', () => {
+    it('is an instance of Transport', () => {
+      const transport = new HttpsTransport({ edvId, invocationSigner })
+      transport.should.be.instanceOf(Transport)
+    })
+
+    it('assertTransport accepts an HttpsTransport instance', () => {
+      const transport = new HttpsTransport({ edvId, invocationSigner })
+      let err: any = null
+      try {
+        assertTransport(transport)
+      } catch (caught) {
+        err = caught
+      }
+      should.not.exist(err)
+    })
+
+    it('assertTransport accepts any Transport subclass instance', () => {
+      class CustomTransport extends Transport {}
+      let err: any = null
+      try {
+        assertTransport(new CustomTransport())
+      } catch (caught) {
+        err = caught
+      }
+      should.not.exist(err)
+    })
+
+    it('assertTransport rejects a plain object that is not a Transport', () => {
+      let err: any = null
+      try {
+        // a duck-typed object with all the methods is no longer accepted
+        assertTransport({ get() {}, insert() {}, update() {} })
+      } catch (caught) {
+        err = caught
+      }
+      should.exist(err)
+      err.should.be.instanceOf(TypeError)
     })
   })
 })

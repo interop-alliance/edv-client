@@ -20,7 +20,7 @@ export class Transport {
    *   created EDV.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async createEdv({ url, config }: any = {}) {
+  async createEdv({ url, config }: any = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -33,7 +33,7 @@ export class Transport {
    * @returns {Promise<object>} - Resolves to the configuration for the EDV.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getConfig({ id }: any = {}) {
+  async getConfig({ id }: any = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -48,7 +48,7 @@ export class Transport {
    * @returns {Promise<void>} - Settles once the operation completes.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async updateConfig({ config }: any = {}) {
+  async updateConfig({ config }: any = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -63,10 +63,16 @@ export class Transport {
    *
    * @returns {Promise<Array>} - Resolves to the matching EDV configurations.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async findConfigs({ controller, referenceId, after, limit }: any = {}) {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  async findConfigs({
+    controller,
+    referenceId,
+    after,
+    limit
+  }: any = {}): Promise<any> {
     _throwNotImplemented()
   }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   /**
    * Sends a new encrypted document to an EDV server. If the server reports
@@ -79,7 +85,7 @@ export class Transport {
    * @returns {Promise} - Settles once the operation completes.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async insert({ encrypted }: any = {}) {
+  async insert({ encrypted }: any = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -94,7 +100,7 @@ export class Transport {
    * @returns {Promise} - Settles once the operation completes.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async update({ encrypted }: any = {}) {
+  async update({ encrypted }: any = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -114,7 +120,7 @@ export class Transport {
    * @returns {Promise} - Settles once the operation completes.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async updateIndex({ docId, entry }: any = {}) {
+  async updateIndex({ docId, entry }: any = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -127,7 +133,7 @@ export class Transport {
    * @returns {Promise<object>} - Resolves to the encrypted document.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async get({ id }: any = {}) {
+  async get({ id }: any = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -142,7 +148,7 @@ export class Transport {
    *   `{documents: [...]}` or `{count: docCount}` if `query.count === true`.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async find({ query }: any = {}) {
+  async find({ query }: any = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -155,7 +161,7 @@ export class Transport {
    * @returns {Promise<object>} Resolves once the operation completes.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async revokeCapability({ capabilityToRevoke }: any = {}) {
+  async revokeCapability({ capabilityToRevoke }: any = {}): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -169,7 +175,7 @@ export class Transport {
    * @returns {Promise} - Settles once the operation completes.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async storeChunk({ docId, chunk }: any) {
+  async storeChunk({ docId, chunk }: any): Promise<any> {
     _throwNotImplemented()
   }
 
@@ -183,7 +189,7 @@ export class Transport {
    * @returns {Promise<object>} - Resolves to the chunk data.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getChunk({ docId, chunkIndex }: any = {}) {
+  async getChunk({ docId, chunkIndex }: any = {}): Promise<any> {
     _throwNotImplemented()
   }
 }
