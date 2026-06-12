@@ -4,10 +4,11 @@
 import { assert, assertInvocationSigner } from './assert.js'
 import { DEFAULT_HEADERS, httpClient } from '@interop/http-client'
 import { signCapabilityInvocation } from '@interop/http-signature-zcap-invoke'
+import { Transport } from './Transport.js'
 
 const ZCAP_ROOT_PREFIX = 'urn:zcap:root:'
 
-export class HttpsTransport {
+export class HttpsTransport extends Transport {
   capability: any
   defaultHeaders: any
   edvId: any
@@ -42,6 +43,7 @@ export class HttpsTransport {
     invocationSigner,
     url
   }: any = {}) {
+    super()
     if (url !== undefined) {
       assert(url, 'url', 'string')
     }
@@ -62,7 +64,7 @@ export class HttpsTransport {
   /**
    * @inheritdoc
    */
-  async createEdv({ config }: any = {}) {
+  override async createEdv({ config }: any = {}) {
     let { capability, url } = this
     if (!url) {
       url =
@@ -98,7 +100,7 @@ export class HttpsTransport {
   /**
    * @inheritdoc
    */
-  async getConfig({ id = this.edvId }: any = {}) {
+  override async getConfig({ id = this.edvId }: any = {}) {
     const { capability } = this
     if (!(id || capability)) {
       throw new TypeError('"capability" is required if "id" was not provided.')
@@ -127,7 +129,7 @@ export class HttpsTransport {
   /**
    * @inheritdoc
    */
-  async updateConfig({ config }: any = {}) {
+  override async updateConfig({ config }: any = {}) {
     const { capability, edvId } = this
     if (!(edvId || capability)) {
       throw new TypeError(
@@ -154,7 +156,7 @@ export class HttpsTransport {
   /**
    * @inheritdoc
    */
-  async findConfigs({ controller, referenceId, after, limit }: any = {}) {
+  override async findConfigs({ controller, referenceId, after, limit }: any = {}) {
     let { capability, url } = this
     if (!url) {
       url =
@@ -195,7 +197,7 @@ export class HttpsTransport {
   /**
    * @inheritdoc
    */
-  async insert({ encrypted }: any = {}) {
+  override async insert({ encrypted }: any = {}) {
     // trim document ID and trailing slash to post to `/documents`
     let url = this._getDocUrl(encrypted.id, this.capability)
     if (url.endsWith(encrypted.id)) {
@@ -207,7 +209,7 @@ export class HttpsTransport {
   /**
    * @inheritdoc
    */
-  async update({ encrypted }: any = {}) {
+  override async update({ encrypted }: any = {}) {
     const url = this._getDocUrl(encrypted.id, this.capability)
     await this._signedHttpPost({ url, json: encrypted, insert: false })
   }
@@ -215,7 +217,7 @@ export class HttpsTransport {
   /**
    * @inheritdoc
    */
-  async updateIndex({ docId, entry }: any = {}) {
+  override async updateIndex({ docId, entry }: any = {}) {
     const url = this._getDocUrl(docId, this.capability) + '/index'
     await this._signedHttpPost({ url, json: entry, insert: false })
   }
@@ -223,7 +225,7 @@ export class HttpsTransport {
   /**
    * @inheritdoc
    */
-  async get({ id }: any = {}) {
+  override async get({ id }: any = {}) {
     const url = this._getDocUrl(id, this.capability)
     const response = await this._signedHttpGet({
       url,
@@ -235,7 +237,7 @@ export class HttpsTransport {
   /**
    * @inheritdoc
    */
-  async find({ query }: any = {}) {
+  override async find({ query }: any = {}) {
     const { capability, edvId } = this
     let url = HttpsTransport._getInvocationTarget({ capability })
     if (!url) {
@@ -284,7 +286,7 @@ export class HttpsTransport {
   /**
    * @inheritdoc
    */
-  async revokeCapability({ capabilityToRevoke }: any = {}) {
+  override async revokeCapability({ capabilityToRevoke }: any = {}) {
     assert(capabilityToRevoke, 'capabilityToRevoke', 'object')
 
     let { edvId, capability } = this
@@ -315,7 +317,7 @@ export class HttpsTransport {
   /**
    * @inheritdoc
    */
-  async storeChunk({ docId, chunk }: any) {
+  override async storeChunk({ docId, chunk }: any) {
     // append `/chunks/<chunkIndex>`
     const { index } = chunk
     const url = this._getDocUrl(docId, this.capability) + `/chunks/${index}`
@@ -325,7 +327,7 @@ export class HttpsTransport {
   /**
    * @inheritdoc
    */
-  async getChunk({ docId, chunkIndex }: any = {}) {
+  override async getChunk({ docId, chunkIndex }: any = {}) {
     // append `/chunks/<chunkIndex>`
     const url =
       this._getDocUrl(docId, this.capability) + `/chunks/${chunkIndex}`

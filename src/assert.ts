@@ -2,6 +2,7 @@
  * Copyright (c) 2022 Digital Bazaar, Inc. All rights reserved.
  */
 import { base58btc } from './baseX.js'
+import { Transport } from './Transport.js'
 
 export function assert(variable: any, name: string, types: string | string[]) {
   if (!Array.isArray(types)) {
@@ -71,4 +72,7 @@ export function assertInvocationSigner(invocationSigner: any) {
 
 export function assertTransport(transport: any) {
   assert(transport, 'transport', 'object')
+  if (!(transport instanceof Transport)) {
+    throw new TypeError('"transport" must be a Transport instance.')
+  }
 }

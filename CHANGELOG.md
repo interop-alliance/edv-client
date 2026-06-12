@@ -15,6 +15,11 @@
 
 ### Changed
 
+- `HttpsTransport` now extends the `Transport` base class (overriding each of
+  its operations), and `assertTransport()` requires a `Transport` instance
+  rather than accepting any object. Custom transports must now extend
+  `Transport`. The exported `HttpsTransport` is unchanged for typical callers,
+  which obtain their transport from `EdvClient`.
 - Type pre-encryption recipient inputs as `IRecipientTemplate` (from
   `@interop/data-integrity-core`) rather than `IRecipient`:
   `EdvDocument.recipients` and `_createDefaultRecipients()` now use the template
