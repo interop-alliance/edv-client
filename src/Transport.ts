@@ -103,9 +103,7 @@ export class Transport {
    * @returns {Promise<void>} - Settles once the operation completes.
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
-  async updateConfig({
-    config
-  }: { config?: IEDVConfig } = {}): Promise<any> {
+  async updateConfig({ config }: { config?: IEDVConfig } = {}): Promise<any> {
     _throwNotImplemented()
   }
   /* eslint-enable @typescript-eslint/no-unused-vars */

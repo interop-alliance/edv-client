@@ -261,7 +261,9 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async insert({ encrypted }: { encrypted?: IEncryptedDocument } = {}) {
+  override async insert({
+    encrypted
+  }: { encrypted?: IEncryptedDocument } = {}) {
     assert(encrypted, 'encrypted', 'object')
     // trim document ID and trailing slash to post to `/documents`
     let url = this._getDocUrl(encrypted.id, this.capability)
@@ -274,7 +276,9 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async update({ encrypted }: { encrypted?: IEncryptedDocument } = {}) {
+  override async update({
+    encrypted
+  }: { encrypted?: IEncryptedDocument } = {}) {
     assert(encrypted, 'encrypted', 'object')
     const url = this._getDocUrl(encrypted.id, this.capability)
     await this._signedHttpPost({ url, json: encrypted, insert: false })
