@@ -4,13 +4,13 @@
 
 ### Fixed
 
-- `HttpsTransport.revokeCapability()` no longer throws
-  "this.parseEdvId is not a function" when neither an `edvId` nor an object
-  `capability` is configured. In that branch it derives the EDV ID from the
-  capability being revoked; it previously called `this.parseEdvId()`, which is
-  defined only on `EdvClient`, not `HttpsTransport`. The EDV-ID parsing now
-  lives in the shared `zcapUrls` helpers and is used directly. (This bug is also
-  present in the upstream Digital Bazaar `edv-client`.)
+- `HttpsTransport.revokeCapability()` no longer throws "this.parseEdvId is not a
+  function" when neither an `edvId` nor an object `capability` is configured. In
+  that branch it derives the EDV ID from the capability being revoked; it
+  previously called `this.parseEdvId()`, which is defined only on `EdvClient`,
+  not `HttpsTransport`. The EDV-ID parsing now lives in the shared `zcapUrls`
+  helpers and is used directly. (This bug is also present in the upstream
+  Digital Bazaar `edv-client`.)
 - `HttpsTransport.updateConfig()` now returns after sending the unsigned request
   when no `invocationSigner` is given. It previously omitted the `return` and
   fell through to also call `_signedHttpPost()`, double-posting the config and
