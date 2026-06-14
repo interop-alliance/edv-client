@@ -1,5 +1,12 @@
 # @interop/edv-client ChangeLog
 
+## 17.2.0 - 2026-06-
+
+### Changed
+
+- Update to latest `@digitalbazaar/minimal-cipher@7.4.0` and.
+  `@interop/x25519-key-agreement-key@5.1.0`.
+
 ## 17.1.0 - 2026-06-13
 
 ### Fixed
