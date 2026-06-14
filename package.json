@@ -1,7 +1,7 @@
 {
   "name": "@interop/edv-client",
-  "version": "17.1.0",
-  "description": "JavaScript Encrypted Data Vault",
+  "version": "17.2.0",
+  "description": "JavaScript/TypeScript Encrypted Data Vault client library.",
   "license": "BSD-3-Clause",
   "type": "module",
   "exports": {
