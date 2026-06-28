@@ -50,12 +50,10 @@ export class LegacyIndexHelperVersion1 {
     if (!Array.isArray(attribute)) {
       attributes = [attribute]
     }
-    if (
-      !(
-        attributes.length > 0 &&
-        attributes.every((x: any) => typeof x === 'string')
-      )
-    ) {
+    if (!(
+      attributes.length > 0 &&
+      attributes.every((x: any) => typeof x === 'string')
+    )) {
       throw new TypeError(
         '"attribute" must be a string or an array of strings.'
       )
@@ -526,15 +524,13 @@ export class LegacyIndexHelperVersion1 {
 }
 
 function _assertHmac(hmac: any) {
-  if (
-    !(
-      hmac &&
-      typeof hmac === 'object' &&
-      typeof hmac.id === 'string' &&
-      typeof hmac.sign === 'function' &&
-      typeof hmac.verify === 'function'
-    )
-  ) {
+  if (!(
+    hmac &&
+    typeof hmac === 'object' &&
+    typeof hmac.id === 'string' &&
+    typeof hmac.sign === 'function' &&
+    typeof hmac.verify === 'function'
+  )) {
     throw new TypeError(
       '"hmac" must be an object with "id", "sign", and "verify" properties.'
     )

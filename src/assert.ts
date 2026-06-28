@@ -50,14 +50,12 @@ export function assertDocId(id: any): asserts id is string {
     // multibase base58 (starts with 'z')
     // 128-bit random number, multibase encoded
     // 0x00 = identity tag, 0x10 = length (16 bytes) + 16 random bytes
-    if (
-      !(
-        id.startsWith('z') &&
-        buf.length === 18 &&
-        buf[0] === 0x00 &&
-        buf[1] === 0x10
-      )
-    ) {
+    if (!(
+      id.startsWith('z') &&
+      buf.length === 18 &&
+      buf[0] === 0x00 &&
+      buf[1] === 0x10
+    )) {
       throw new Error('Invalid document ID.')
     }
   } catch {

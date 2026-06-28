@@ -31,8 +31,7 @@ const DEFAULT_CHUNK_SIZE = 1048576
  * and values are HMAC-blinded by `IndexHelper` before being sent to the server.
  */
 export type EqualsFilter =
-  | Record<string, unknown>
-  | Array<Record<string, unknown>>
+  Record<string, unknown> | Array<Record<string, unknown>>
 
 /**
  * A `has` attribute filter for `find` / `count`: an attribute name, or an

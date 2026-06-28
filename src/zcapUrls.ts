@@ -50,9 +50,9 @@ export function getInvocationTarget({
     ;({ invocationTarget } = capability)
   }
 
-  if (
-    !(typeof invocationTarget === 'string' && invocationTarget.includes(':'))
-  ) {
+  if (!(
+    typeof invocationTarget === 'string' && invocationTarget.includes(':')
+  )) {
     throw new TypeError(
       '"invocationTarget" from capability must be an "https" URL.'
     )

@@ -1,5 +1,11 @@
 # @interop/edv-client ChangeLog
 
+## 17.2.1 - 2026-06-28
+
+### Changed
+
+- Update to latest `@interop/` deps.
+
 ## 17.2.0 - 2026-06-14
 
 ### Changed
