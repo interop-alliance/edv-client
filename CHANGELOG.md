@@ -1,5 +1,25 @@
 # @interop/edv-client ChangeLog
 
+## 17.3.0 - TBD
+
+### Added
+
+- New `EdvDocumentCipher` class (exported from the package index): a
+  transport-free JWE codec with public `encrypt()`, `decrypt()`, and
+  `createDefaultRecipients()` methods. This lets callers that own their own
+  transport (for example, Wallet Attached Storage, whose `Collection` /
+  `Resource` is the transport) turn cleartext documents into EDV envelopes, and
+  back, without driving any I/O -- previously only reachable through
+  `EdvClientCore`'s private `_encrypt` / `_decrypt` / `_createDefaultRecipients`.
+- `EdvClientCore` now exposes the codec backing it as a public `documentCipher`
+  property.
+
+### Changed
+
+- `EdvClientCore`'s encrypt / decrypt primitives were factored out into
+  `EdvDocumentCipher`; `insert` / `update` / `get` / `find` now delegate to
+  `documentCipher`. No behavior or wire-format change.
+
 ## 17.2.1 - 2026-06-28
 
 ### Changed
