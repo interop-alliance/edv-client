@@ -19,6 +19,7 @@ import type {
 } from '@interop/data-integrity-core'
 import type { Transport } from './Transport.js'
 import { getRandomBytes } from './util.js'
+import { EdvDocumentCipher } from './EdvDocumentCipher.js'
 import { IndexHelper } from './IndexHelper.js'
 import { LegacyIndexHelperVersion1 } from './LegacyIndexHelperVersion1.js'
 
@@ -80,6 +81,12 @@ export class EdvClientCore {
   keyResolver?: IKeyResolver
   cipher: Cipher
   indexHelper: any
+  /**
+   * The transport-free JWE codec backing this core. Public so that callers
+   * which own their own transport (for example, Wallet Attached Storage) can
+   * encrypt / decrypt EDV envelopes directly, without driving any I/O.
+   */
+  documentCipher: EdvDocumentCipher
 
   /**
    * Creates the core of an EdvClient. The core must be coupled with a
@@ -130,6 +137,10 @@ export class EdvClientCore {
     } else {
       throw new Error(`Unsupported "_attributeVersion" "${_attributeVersion}".`)
     }
+    this.documentCipher = new EdvDocumentCipher({
+      cipher: this.cipher,
+      indexHelper: this.indexHelper
+    })
   }
 
   /**
@@ -201,7 +212,7 @@ export class EdvClientCore {
 
     // if no recipients specified, add default
     if (recipients.length === 0 && keyAgreementKey) {
-      recipients = this._createDefaultRecipients(keyAgreementKey)
+      recipients = this.documentCipher.createDefaultRecipients(keyAgreementKey)
     }
     // if a stream was specified, indicate a new stream of data will be
     // associated with this document
@@ -212,7 +223,7 @@ export class EdvClientCore {
       }
       keyResolver = _createCachedKeyResolver(keyResolver)
     }
-    const encrypted = await this._encrypt({
+    const encrypted = await this.documentCipher.encrypt({
       doc,
       recipients,
       keyResolver,
@@ -223,11 +234,12 @@ export class EdvClientCore {
     // send encrypted doc to EDV server
     await transport.insert({ encrypted })
 
-    let result = encrypted
-    encrypted.content = doc.content
-    encrypted.meta = doc.meta
+    // reattach cleartext content / meta / stream for the caller's convenience
+    let result: any = encrypted
+    result.content = doc.content
+    result.meta = doc.meta
     if (doc.stream !== undefined) {
-      encrypted.stream = doc.stream
+      result.stream = doc.stream
     }
 
     // if a `stream` was given, update it
@@ -289,7 +301,7 @@ export class EdvClientCore {
 
     // if no recipients specified, add default
     if (recipients.length === 0 && keyAgreementKey) {
-      recipients = this._createDefaultRecipients(keyAgreementKey)
+      recipients = this.documentCipher.createDefaultRecipients(keyAgreementKey)
     }
     // if a stream was specified, indicate a new stream of data will be
     // associated with this document
@@ -300,7 +312,7 @@ export class EdvClientCore {
       }
       keyResolver = _createCachedKeyResolver(keyResolver)
     }
-    const encrypted = await this._encrypt({
+    const encrypted = await this.documentCipher.encrypt({
       doc,
       recipients,
       keyResolver,
@@ -311,11 +323,12 @@ export class EdvClientCore {
     // send encrypted doc to EDV server
     await transport.update({ encrypted })
 
-    let result = encrypted
-    encrypted.content = doc.content
-    encrypted.meta = doc.meta
+    // reattach cleartext content / meta / stream for the caller's convenience
+    let result: any = encrypted
+    result.content = doc.content
+    result.meta = doc.meta
     if (doc.stream !== undefined) {
-      encrypted.stream = doc.stream
+      result.stream = doc.stream
     }
 
     // if a `stream` was given, update it
@@ -448,7 +461,7 @@ export class EdvClientCore {
 
     // get encrypted doc from EDV server
     const encryptedDoc = await transport.get({ id })
-    return this._decrypt({ encryptedDoc, keyAgreementKey })
+    return this.documentCipher.decrypt({ encryptedDoc, keyAgreementKey })
   }
 
   /**
@@ -628,7 +641,7 @@ export class EdvClientCore {
     } else if (documents) {
       const decryptedDocs = await Promise.all(
         documents.map((encryptedDoc: any) =>
-          this._decrypt({ encryptedDoc, keyAgreementKey })
+          this.documentCipher.decrypt({ encryptedDoc, keyAgreementKey })
         )
       )
       rval = { documents: decryptedDocs }
@@ -703,129 +716,6 @@ export class EdvClientCore {
   // expose `generateId` on instance as well
   async generateId() {
     return EdvClientCore.generateId()
-  }
-
-  // helper to create default recipients
-  _createDefaultRecipients(
-    keyAgreementKey: IKeyAgreementKey
-  ): IRecipientTemplate[] {
-    return keyAgreementKey
-      ? [
-          {
-            header: {
-              kid: keyAgreementKey.id,
-              // only supported algorithm
-              alg: 'ECDH-ES+A256KW'
-            }
-          }
-        ]
-      : []
-  }
-
-  // helper that decrypts an encrypted doc to include its (cleartext) content
-  async _decrypt({ encryptedDoc, keyAgreementKey }: any) {
-    // validate `encryptedDoc`
-    assert(encryptedDoc, 'encryptedDoc', 'object')
-    assert(encryptedDoc.id, 'encryptedDoc.id', 'string')
-    assert(encryptedDoc.jwe, 'encryptedDoc.jwe', 'object')
-
-    // decrypt doc content
-    const { cipher } = this
-    const { jwe } = encryptedDoc
-    const data: any = await cipher.decryptObject({ jwe, keyAgreementKey })
-    if (data === null) {
-      throw new Error('Decryption failed.')
-    }
-    const { content, meta, stream } = data
-    // append decrypted content, meta, and stream
-    const doc = { ...encryptedDoc, content, meta }
-    if (stream !== undefined) {
-      doc.stream = stream
-    }
-    return doc
-  }
-
-  // helper that creates an encrypted doc using a doc's (clear) content,
-  // meta, and stream ... and blinding any attributes for indexing
-  async _encrypt({ doc, recipients, keyResolver, hmac, update }: any) {
-    const encrypted = { ...doc }
-    if (!encrypted.meta) {
-      encrypted.meta = {}
-    }
-
-    /* Note: There is an assumption that EDVs will be ported in their
-    entirety. If the contents of a single EDV document is to be copied to
-    another EDV, it should receive a new EDV document ID on the target EDV. No
-    EDV document with the same ID should live on more than one EDV unless those
-    EDVs are intended to be mirrors of one another. This reduces
-    synchronization issues to a sequence number instead of something more
-    complicated involving digests and other synchronization complexities. */
-
-    if (update) {
-      if ('sequence' in encrypted) {
-        // Sequence is limited to MAX_SAFE_INTEGER - 1 to avoid unexpected
-        // behavior when a client attempts to increment the sequence number.
-        if (!Number.isSafeInteger(encrypted.sequence)) {
-          throw new Error('"sequence" must be a non-negative safe integer.')
-        }
-        if (!(encrypted.sequence < Number.MAX_SAFE_INTEGER - 1)) {
-          throw new Error('"sequence" is too large.')
-        }
-        encrypted.sequence++
-      } else {
-        encrypted.sequence = 0
-      }
-    } else {
-      // sequence must be zero for new docs
-      if ('sequence' in encrypted && encrypted.sequence !== 0) {
-        throw new Error(
-          `Invalid "sequence" for a new document: ${encrypted.sequence}.`
-        )
-      }
-      encrypted.sequence = 0
-    }
-
-    const { cipher, indexHelper } = this
-
-    // include existing recipients
-    if (encrypted.jwe && encrypted.jwe.recipients) {
-      const prev = encrypted.jwe.recipients.slice()
-      if (recipients) {
-        // add any new recipients
-        for (const recipient of recipients) {
-          if (!_findRecipient(prev, recipient)) {
-            prev.push(recipient)
-          }
-        }
-      }
-      recipients = prev
-    } else if (!(Array.isArray(recipients) && recipients.length > 0)) {
-      throw new TypeError('"recipients" must be a non-empty array.')
-    }
-
-    // update indexed entries and jwe
-    const { content, meta, stream } = doc
-    const obj: any = { content, meta }
-    if (stream !== undefined) {
-      obj.stream = stream
-    }
-    const [indexed, jwe] = await Promise.all([
-      hmac
-        ? indexHelper.updateEntry({ hmac, doc: encrypted })
-        : doc.indexed || [],
-      cipher.encryptObject({ obj, recipients, keyResolver })
-    ])
-    delete encrypted.content
-    delete encrypted.meta
-    if (encrypted.stream) {
-      encrypted.stream = {
-        sequence: encrypted.stream.sequence,
-        chunks: encrypted.stream.chunks
-      }
-    }
-    encrypted.indexed = indexed
-    encrypted.jwe = jwe
-    return encrypted
   }
 
   // helper that creates or updates a stream of data associated with a doc
@@ -903,13 +793,6 @@ function _checkIndexing(hmac: any) {
   if (!hmac) {
     throw Error('Indexing disabled; no HMAC specified.')
   }
-}
-
-function _findRecipient(recipients: any, recipient: any) {
-  const { kid, alg } = recipient.header
-  return recipients.find(
-    (r: any) => r.header.kid === kid && r.header.alg === alg
-  )
 }
 
 function _createCachedKeyResolver(keyResolver: any) {
