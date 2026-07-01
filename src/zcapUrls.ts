@@ -17,6 +17,20 @@ import type { IZcap } from '@interop/data-integrity-core'
 export const ZCAP_ROOT_PREFIX = 'urn:zcap:root:'
 
 /**
+ * Synthesizes the URN id of the root zcap whose invocation target is the given
+ * URL.
+ *
+ * @param {object} options - The options to use.
+ * @param {string} options.url - The invocation target URL (an EDV or document
+ *   URL).
+ *
+ * @returns {string} The root zcap URN.
+ */
+export function createRootZcapId({ url }: { url: string }): string {
+  return `${ZCAP_ROOT_PREFIX}${encodeURIComponent(url)}`
+}
+
+/**
  * Gets the invocation target (an `https` URL) for a capability.
  *
  * @param {object} options - The options to use.
@@ -75,7 +89,10 @@ export function parseEdvId({
 }: {
   capability?: IZcap | string
 } = {}): string {
-  const invocationTarget = getInvocationTarget({ capability }) as string
+  const invocationTarget = getInvocationTarget({ capability })
+  if (invocationTarget === null) {
+    throw new Error('"capability" is required to parse an EDV ID.')
+  }
   const start = invocationTarget.lastIndexOf('/edvs/')
   if (start === -1) {
     throw new Error(`Invalid EDV invocation target (${invocationTarget}).`)

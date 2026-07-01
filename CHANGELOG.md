@@ -1,5 +1,50 @@
 # @interop/edv-client ChangeLog
 
+## Unreleased - TBD
+
+### Changed
+
+- `IndexHelper` and `LegacyIndexHelperVersion1` now share a new
+  `IndexHelperBase` class that holds the blinding-agnostic machinery (index
+  registration, entry creation, query building, index matching, attribute
+  dereferencing). Each helper keeps its own version-specific blinding pipeline
+  unchanged, so the on-the-wire blinded output is byte-identical to before. A
+  new golden-vector test pins that output for both attribute versions so any
+  future drift -- especially one that would break reading or migrating legacy
+  (version 1) data -- fails loudly. Purely internal; no public API change.
+
+### Fixed
+
+- `update()` / `delete()` on a document whose `jwe.recipients` was cleared to an
+  empty array (the documented way to remove recipients) no longer slips past the
+  non-empty guard in `EdvDocumentCipher.encrypt()`. An empty `recipients` array
+  now correctly falls through to the `"recipients" must be a non-empty array`
+  error instead of re-encrypting for zero recipients and producing an
+  undecryptable JWE.
+- `getStream()` now asserts `doc.stream.chunks` is a number instead of looping
+  over phantom chunks (fetching chunk 0, 1, 2, ... until a server 404) when the
+  count is missing or non-numeric.
+- `HttpsTransport.getConfig({id})` for a different EDV than the transport was
+  constructed for now synthesizes the root zcap from the requested URL instead
+  of signing with the constructor's `edvId` root zcap (which produced a 403).
+- `EdvDocumentCipher.encrypt()` now rejects a negative `sequence` on update, as
+  its `"sequence" must be a non-negative safe integer` error already promised.
+- `update()` no longer mutates the caller's `doc` object on a streaming update;
+  it clones `doc` up front for symmetry with `insert()`.
+- `HttpsTransport._getDocUrl()` now scopes a vault-root capability target to
+  `<target>/documents/<id>` instead of dropping the document id and sending
+  every operation to the vault URL.
+- `find()` no longer throws when a response defines `hasMore` but neither
+  `documents` nor `documentIds`; the return value is initialized to `{}`.
+- `parseEdvId()` now throws a descriptive error when the capability is missing
+  instead of an opaque `TypeError`.
+- `Transport.storeChunk()` / `HttpsTransport.storeChunk()` now default their
+  options argument to `{}`, matching every sibling method, so a no-arg call
+  throws a clear error rather than a cryptic destructuring error.
+- The `_parseAttribute` bad-prefix error in `IndexHelper` and
+  `LegacyIndexHelperVersion1` now interpolates the offending attribute instead
+  of printing a literal `${attribute}`.
+
 ## 17.3.0 - 2026-06-30
 
 ### Added

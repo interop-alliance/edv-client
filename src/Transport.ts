@@ -247,7 +247,7 @@ export class Transport {
   async storeChunk({
     docId,
     chunk
-  }: ITransportStoreChunkOptions): Promise<any> {
+  }: ITransportStoreChunkOptions = {}): Promise<any> {
     _throwNotImplemented()
   }
   /* eslint-enable @typescript-eslint/no-unused-vars */

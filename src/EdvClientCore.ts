@@ -299,6 +299,7 @@ export class EdvClientCore {
     assertDocId(doc.id)
     assertTransport(transport)
 
+    doc = { ...doc }
     // if no recipients specified, add default
     if (recipients.length === 0 && keyAgreementKey) {
       recipients = this.documentCipher.createDefaultRecipients(keyAgreementKey)
@@ -495,6 +496,7 @@ export class EdvClientCore {
     const { cipher } = this
     const { id: docId } = doc
     const state = doc.stream
+    assert(state.chunks, 'doc.stream.chunks', 'number')
     let chunkIndex = 0
     const stream = new ReadableStream({
       async pull(controller) {
@@ -635,7 +637,7 @@ export class EdvClientCore {
 
     // decrypt documents (if full documents are returned)
     const { documents, documentIds, hasMore } = result
-    let rval: any
+    let rval: any = {}
     if (documentIds) {
       rval = { documentIds }
     } else if (documents) {
