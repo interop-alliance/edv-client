@@ -295,8 +295,7 @@ export class EdvClientCore {
     hmac = this.hmac,
     transport
   }: IWriteOptions = {}) {
-    assertDocument(doc)
-    assertDocId(doc.id)
+    assertDocument(doc, { requireId: true })
     assertTransport(transport)
 
     doc = { ...doc }
@@ -373,8 +372,7 @@ export class EdvClientCore {
     hmac = this.hmac,
     transport
   }: { doc?: IEDVDocument; hmac?: IHMAC; transport?: Transport } = {}) {
-    assertDocument(doc)
-    assertDocId(doc.id)
+    assertDocument(doc, { requireId: true })
     assertTransport(transport)
     _checkIndexing(hmac)
 
@@ -416,8 +414,7 @@ export class EdvClientCore {
     keyAgreementKey?: IKeyAgreementKey
     transport?: Transport
   } = {}) {
-    assertDocument(doc)
-    assertDocId(doc.id)
+    assertDocument(doc, { requireId: true })
     assertTransport(transport)
 
     // clear document, preserving only its `id`, `sequence`, and previous
