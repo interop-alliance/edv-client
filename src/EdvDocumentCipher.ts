@@ -162,7 +162,8 @@ export class EdvDocumentCipher {
       if ('sequence' in encrypted) {
         // Sequence is limited to MAX_SAFE_INTEGER - 1 to avoid unexpected
         // behavior when a client attempts to increment the sequence number.
-        if (!Number.isSafeInteger(encrypted.sequence)) {
+        if (!Number.isSafeInteger(encrypted.sequence) ||
+          encrypted.sequence < 0) {
           throw new Error('"sequence" must be a non-negative safe integer.')
         }
         if (!(encrypted.sequence < Number.MAX_SAFE_INTEGER - 1)) {
@@ -185,7 +186,7 @@ export class EdvDocumentCipher {
     const { cipher, indexHelper } = this
 
     // include existing recipients
-    if (encrypted.jwe && encrypted.jwe.recipients) {
+    if (encrypted.jwe && encrypted.jwe.recipients?.length > 0) {
       const prev = encrypted.jwe.recipients.slice()
       if (recipients) {
         // add any new recipients

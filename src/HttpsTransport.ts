@@ -13,9 +13,9 @@ import type {
 } from '@interop/data-integrity-core'
 import { Transport } from './Transport.js'
 import {
+  createRootZcapId,
   getInvocationTarget,
-  parseEdvId,
-  ZCAP_ROOT_PREFIX
+  parseEdvId
 } from './zcapUrls.js'
 import type {
   ITransportCreateEdvOptions,
@@ -119,7 +119,7 @@ export class HttpsTransport extends Transport {
     this.invocationSigner = invocationSigner
     this.url = url
     if (edvId) {
-      this._rootZcapId = `${ZCAP_ROOT_PREFIX}${encodeURIComponent(edvId)}`
+      this._rootZcapId = createRootZcapId({ url: edvId })
     }
   }
 
@@ -144,7 +144,7 @@ export class HttpsTransport extends Transport {
     }
 
     if (!capability) {
-      capability = `${ZCAP_ROOT_PREFIX}${encodeURIComponent(url)}`
+      capability = createRootZcapId({ url })
     }
 
     // submit request w/signed zcap invocation
@@ -161,11 +161,11 @@ export class HttpsTransport extends Transport {
    * @inheritdoc
    */
   override async getConfig({ id = this.edvId }: { id?: string } = {}) {
-    const { capability } = this
+    let { capability } = this
     if (!(id || capability)) {
       throw new TypeError('"capability" is required if "id" was not provided.')
     }
-    const url = getInvocationTarget({ capability }) || id
+    const url = getInvocationTarget({ capability }) || (id as string)
 
     const { defaultHeaders, httpsAgent: agent, invocationSigner } = this
     if (!invocationSigner) {
@@ -175,6 +175,12 @@ export class HttpsTransport extends Transport {
         agent
       })
       return response.data
+    }
+
+    // synthesize the root zcap from the requested URL, so a client built for
+    // one EDV can fetch another EDV's config by `id`
+    if (!capability) {
+      capability = createRootZcapId({ url })
     }
 
     // send request w/ zcap invocation
@@ -249,7 +255,7 @@ export class HttpsTransport extends Transport {
     }
 
     if (!capability) {
-      capability = `${ZCAP_ROOT_PREFIX}${encodeURIComponent(url)}`
+      capability = createRootZcapId({ url })
     }
 
     // add params to URL so they will be signed
@@ -380,7 +386,7 @@ export class HttpsTransport extends Transport {
       getInvocationTarget({ capability }) ||
       `${revokePath}/${encodeURIComponent(capabilityToRevoke.id)}`
     if (!capability) {
-      capability = `${ZCAP_ROOT_PREFIX}${encodeURIComponent(url)}`
+      capability = createRootZcapId({ url })
     }
     await this._signedHttpPost({
       url,
@@ -393,7 +399,10 @@ export class HttpsTransport extends Transport {
   /**
    * @inheritdoc
    */
-  override async storeChunk({ docId, chunk }: ITransportStoreChunkOptions) {
+  override async storeChunk({
+    docId,
+    chunk
+  }: ITransportStoreChunkOptions = {}) {
     assert(chunk, 'chunk', 'object')
     // append `/chunks/<chunkIndex>`
     const { index } = chunk
@@ -443,15 +452,15 @@ export class HttpsTransport extends Transport {
       })
       // send request
       return await httpClient.get(url, { headers, agent })
-    } catch (e: any) {
+    } catch (err: any) {
       // normalize not found errors
-      if (notFoundMessage && e.status === 404) {
-        const err: any = new Error(notFoundMessage)
-        err.name = 'NotFoundError'
-        err.cause = e
-        throw err
+      if (notFoundMessage && err.status === 404) {
+        const notFoundError: any = new Error(notFoundMessage)
+        notFoundError.name = 'NotFoundError'
+        notFoundError.cause = err
+        throw notFoundError
       }
-      throw e
+      throw err
     }
   }
 
@@ -480,22 +489,22 @@ export class HttpsTransport extends Transport {
 
       // send request
       return await httpClient.post(url, { agent, json, headers })
-    } catch (e: any) {
+    } catch (err: any) {
       // normalize 409 errors to duplicate / conflict errors
-      if (insert !== undefined && e.status === 409) {
-        const cause = e
+      if (insert !== undefined && err.status === 409) {
+        const cause = err
         if (insert) {
           // eslint-disable-next-line no-ex-assign
-          e = new Error('Duplicate error.')
-          e.name = 'DuplicateError'
+          err = new Error('Duplicate error.')
+          err.name = 'DuplicateError'
         } else {
           // eslint-disable-next-line no-ex-assign
-          e = new Error('Conflict error.')
-          e.name = 'InvalidStateError'
+          err = new Error('Conflict error.')
+          err.name = 'InvalidStateError'
         }
-        e.cause = cause
+        err.cause = cause
       }
-      throw e
+      throw err
     }
   }
 
@@ -510,7 +519,12 @@ export class HttpsTransport extends Transport {
       if (target.endsWith('/documents')) {
         return `${target}/${id}`
       }
-      return target
+      // target is a specific document URL
+      if (target.includes('/documents/')) {
+        return target
+      }
+      // target is the vault root; scope it to the document
+      return `${target}/documents/${id}`
     }
     return `${this.edvId}/documents/${id}`
   }
