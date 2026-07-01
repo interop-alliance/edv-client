@@ -1,6 +1,6 @@
 # @interop/edv-client ChangeLog
 
-## Unreleased - TBD
+## 17.3.1 - 2026-06-30
 
 ### Changed
 
