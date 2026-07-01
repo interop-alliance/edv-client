@@ -1,5 +1,22 @@
 # @interop/edv-client ChangeLog
 
+## 17.4.0 - TBD
+
+### Added
+
+- `EdvDocumentCipher.deriveId({ jwe })` (static, with an instance convenience):
+  derives a deterministic, content-derived EDV document id from an encrypted
+  document's JWE -- the SHA-256 of the raw ciphertext octets, truncated to the
+  128-bit EDV id width and encoded in the same multibase identity layout as
+  `EdvClientCore.generateId()` (so it passes the standard EDV id format check
+  and the server's id validation unchanged). Only `jwe.ciphertext` is hashed, so
+  the id stays stable when a recipient is later added. This is the previously
+  deferred "content-derived ids" item: it makes a document content-addressed and
+  therefore immutable (an "update" becomes delete-old + add-new), the id model
+  used by replicated append-only collections. The typical flow is
+  encrypt-then-stamp: `encrypt()` without an `id`, derive from the returned
+  envelope's `jwe`, set it on the envelope.
+
 ## 17.3.1 - 2026-06-30
 
 ### Changed

@@ -11,6 +11,11 @@
  * `EdvClientCore` owns one of these (exposed as `documentCipher`); its public
  * `insert` / `update` / `get` / `find` simply bracket these primitives with
  * `Transport` calls.
+ *
+ * Also hosts `deriveId()`, the content-derived (immutable / content-addressed)
+ * alternative to `EdvClientCore.generateId()`'s random document ids: the id is
+ * a truncated SHA-256 of the envelope's JWE ciphertext, in the same 128-bit
+ * multibase format.
  */
 import { assert } from './assert.js'
 import { Cipher } from '@interop/minimal-cipher'
@@ -18,10 +23,13 @@ import type {
   IEDVDocument,
   IEncryptedDocument,
   IHMAC,
+  IJWE,
   IKeyAgreementKey,
   IKeyResolver,
   IRecipientTemplate
 } from '@interop/data-integrity-core'
+import { base58btc, base64url } from './baseX.js'
+import { sha256 } from './util.js'
 
 export class EdvDocumentCipher {
   cipher: Cipher
@@ -65,6 +73,65 @@ export class EdvDocumentCipher {
           }
         ]
       : []
+  }
+
+  /**
+   * Derives a deterministic, content-derived EDV document id from an encrypted
+   * document's JWE: the SHA-256 of the raw ciphertext octets, truncated to the
+   * 128-bit EDV id width and encoded in the same multibase identity layout as
+   * `EdvClientCore.generateId()` (`'z' + base58btc([0x00, 0x10, ...16 bytes])`).
+   * The result passes the standard EDV id format check and is
+   * indistinguishable on the wire from a random id.
+   *
+   * Only `jwe.ciphertext` is hashed -- not the whole envelope -- so the id
+   * stays stable when a recipient is later added (re-wrapping the content
+   * encryption key changes `jwe.recipients` but not the ciphertext), and
+   * hashing ciphertext the server already stores leaks nothing about the
+   * plaintext. Because JWE encryption is non-deterministic, two independent
+   * encryptions of the same plaintext yield different ids: the id is stable
+   * across replicas of one encryption, not across re-encryptions.
+   *
+   * A content-derived id makes the document content-addressed and therefore
+   * immutable: changing the content changes the id, so an "update" becomes
+   * delete-old + add-new rather than an in-place `sequence` bump. Callers
+   * wanting the classic mutable-document model should keep using random
+   * `generateId()` ids.
+   *
+   * The typical flow is encrypt-then-stamp: `encrypt()` a document without an
+   * `id`, derive the id from the returned envelope's `jwe`, then set it on the
+   * envelope (the id lives outside the JWE, so this does not invalidate it).
+   *
+   * @param options {object}
+   * @param options.jwe {IJWE}   the envelope JWE; must carry a non-empty
+   *   base64url `ciphertext`
+   * @returns {Promise<string>} - Resolves to the multibase-encoded id.
+   */
+  static async deriveId({ jwe }: { jwe: IJWE }): Promise<string> {
+    const ciphertext: unknown = jwe?.ciphertext
+    if (typeof ciphertext !== 'string' || ciphertext.length === 0) {
+      throw new TypeError(
+        '"jwe.ciphertext" must be a non-empty base64url string.'
+      )
+    }
+    const digest = await sha256(base64url.decode(ciphertext))
+    // identity tag 0x00 + length 0x10 (16 bytes) + the truncated digest --
+    // the same layout as `generateId()`'s random ids
+    const buf = new Uint8Array(18)
+    buf[0] = 0x00
+    buf[1] = 0x10
+    buf.set(digest.subarray(0, 16), 2)
+    return 'z' + base58btc.encode(buf)
+  }
+
+  /**
+   * Instance convenience for the static {@link EdvDocumentCipher.deriveId}.
+   *
+   * @param options {object}
+   * @param options.jwe {IJWE}   the envelope JWE
+   * @returns {Promise<string>} - Resolves to the multibase-encoded id.
+   */
+  async deriveId({ jwe }: { jwe: IJWE }): Promise<string> {
+    return EdvDocumentCipher.deriveId({ jwe })
   }
 
   /**
