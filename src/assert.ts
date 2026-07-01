@@ -30,10 +30,15 @@ export function assert<T>(
   }
 }
 
-export function assertDocument(doc: any): asserts doc is IEDVDocument {
+export function assertDocument(
+  doc: any,
+  { requireId = false }: { requireId?: boolean } = {}
+): asserts doc is IEDVDocument {
   assert(doc, 'doc', 'object')
   const { id, content, meta = {}, stream } = doc
-  if (id !== undefined) {
+  // an id is optional on insert (it is auto-generated) but required by
+  // operations that act on an existing document
+  if (requireId || id !== undefined) {
     assertDocId(doc.id)
   }
   assert(content, 'content', 'object')
