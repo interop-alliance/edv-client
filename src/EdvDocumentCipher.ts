@@ -38,13 +38,7 @@ export class EdvDocumentCipher {
    * @param [options.indexHelper] {object} blinds indexable attributes when an
    *   `hmac` is given to `encrypt`
    */
-  constructor({
-    cipher,
-    indexHelper
-  }: {
-    cipher: Cipher
-    indexHelper?: any
-  }) {
+  constructor({ cipher, indexHelper }: { cipher: Cipher; indexHelper?: any }) {
     this.cipher = cipher
     this.indexHelper = indexHelper
   }
@@ -162,8 +156,10 @@ export class EdvDocumentCipher {
       if ('sequence' in encrypted) {
         // Sequence is limited to MAX_SAFE_INTEGER - 1 to avoid unexpected
         // behavior when a client attempts to increment the sequence number.
-        if (!Number.isSafeInteger(encrypted.sequence) ||
-          encrypted.sequence < 0) {
+        if (
+          !Number.isSafeInteger(encrypted.sequence) ||
+          encrypted.sequence < 0
+        ) {
           throw new Error('"sequence" must be a non-negative safe integer.')
         }
         if (!(encrypted.sequence < Number.MAX_SAFE_INTEGER - 1)) {

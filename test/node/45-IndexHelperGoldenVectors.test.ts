@@ -88,13 +88,17 @@ describe('IndexHelper golden vectors', () => {
 
   describe('LegacyIndexHelperVersion1 (version 1)', () => {
     it('blinds a simple attribute to the pinned vector', async () => {
-      const attributes = await blindSimple(new LegacyIndexHelperVersion1(), hmac)
+      const attributes = await blindSimple(
+        new LegacyIndexHelperVersion1(),
+        hmac
+      )
       attributes.should.deep.equal(V1_SIMPLE)
     })
 
     it('blinds a compound attribute to the pinned vector', async () => {
       const attributes = await blindCompound(
-        new LegacyIndexHelperVersion1(), hmac
+        new LegacyIndexHelperVersion1(),
+        hmac
       )
       attributes.should.deep.equal(V1_COMPOUND)
     })

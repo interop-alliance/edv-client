@@ -55,7 +55,8 @@
   transport (for example, Wallet Attached Storage, whose `Collection` /
   `Resource` is the transport) turn cleartext documents into EDV envelopes, and
   back, without driving any I/O -- previously only reachable through
-  `EdvClientCore`'s private `_encrypt` / `_decrypt` / `_createDefaultRecipients`.
+  `EdvClientCore`'s private `_encrypt` / `_decrypt` /
+  `_createDefaultRecipients`.
 - `EdvClientCore` now exposes the codec backing it as a public `documentCipher`
   property.
 

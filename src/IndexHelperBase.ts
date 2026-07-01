@@ -325,8 +325,8 @@ export class IndexHelperBase {
           '"content.foo.bar".'
       )
     }
-    // ensure prefix is valid
-    if (!ATTRIBUTE_PREFIXES.includes(keys[0])) {
+    // ensure prefix is valid (keys is non-empty per the guard above)
+    if (!ATTRIBUTE_PREFIXES.includes(keys[0]!)) {
       throw new Error(
         `Attribute "${attribute}" must be prefixed with one of the ` +
           `following: ${ATTRIBUTE_PREFIXES.join(', ')}`
