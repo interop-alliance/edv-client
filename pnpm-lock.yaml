@@ -21,8 +21,8 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3
       '@interop/minimal-cipher':
-        specifier: ^7.4.1
-        version: 7.4.1
+        specifier: ^7.5.0
+        version: 7.5.0
       '@noble/hashes':
         specifier: ^2.2.0
         version: 2.2.0
@@ -388,8 +388,8 @@ packages:
     resolution: {integrity: sha512-6c8dnoQNIiL25Q4YovC1a44mREO1lzW3F/lmvdwbAMMbhtGGRoQeqo1H4diwNhBzaxRrUMXrAIwbM26POmI/Yg==}
     engines: {node: '>=24.0'}
 
-  '@interop/minimal-cipher@7.4.1':
-    resolution: {integrity: sha512-cYFwelF+HCH1dS48l3w0YEhU+Z/5kJEj52sNoT1ObiMX6hSEJUM0q/b7rDDJ0R7uxqWeaHzx6sKN8PLDNGWVLQ==}
+  '@interop/minimal-cipher@7.5.0':
+    resolution: {integrity: sha512-fvX0udPj3SsnE/qDe00eqmIUWvZQ4nxr+0KZW/HYBvHMM7t/AjjC+ew5NC/f2zy4f+4HDSpAfnKild7z027dBA==}
     engines: {node: '>=24.0'}
 
   '@interop/security-document-loader@9.4.1':
@@ -440,6 +440,10 @@ packages:
     peerDependencies:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
+
+  '@noble/ciphers@2.2.0':
+    resolution: {integrity: sha512-Z6pjIZ/8IJcCGzb2S/0Px5J81yij85xASuk1teLNeg75bfT07MV3a/O2Mtn1I2se43k3lkVEcFaR10N4cgQcZA==}
+    engines: {node: '>= 20.19.0'}
 
   '@noble/curves@2.2.0':
     resolution: {integrity: sha512-T/BoHgFXirb0ENSPBquzX0rcjXeM6Lo892a2jlYJkqk83LqZx0l1Of7DzlKJ6jkpvMrkHSnAcgb5JegL8SeIkQ==}
@@ -2457,10 +2461,11 @@ snapshots:
     dependencies:
       lru-cache: 11.5.1
 
-  '@interop/minimal-cipher@7.4.1':
+  '@interop/minimal-cipher@7.5.0':
     dependencies:
       '@interop/data-integrity-core': 8.1.0
       '@interop/ecdsa-multikey': 2.3.2
+      '@noble/ciphers': 2.2.0
       '@noble/curves': 2.2.0
       '@scure/base': 2.2.0
       '@stablelib/chacha': 2.0.1
@@ -2550,6 +2555,8 @@ snapshots:
       '@emnapi/runtime': 1.11.1
       '@tybys/wasm-util': 0.10.3
     optional: true
+
+  '@noble/ciphers@2.2.0': {}
 
   '@noble/curves@2.2.0':
     dependencies:

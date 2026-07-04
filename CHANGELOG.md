@@ -1,5 +1,11 @@
 # @interop/edv-client ChangeLog
 
+## 17.5.0 -
+
+### Changed
+
+- Update to latest `@interop/minimal-cipher@7.5.0` (adds AES-KW support for React Native).
+
 ## 17.4.0 - 2026-07-01
 
 ### Added
