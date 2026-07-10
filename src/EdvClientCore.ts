@@ -72,6 +72,7 @@ export interface IFindOptions extends ICountOptions {
   returnDocuments?: boolean
   count?: boolean
   limit?: number
+  cursor?: string
 }
 
 export class EdvClientCore {
@@ -587,10 +588,14 @@ export class EdvClientCore {
    *   that match a query or to `true` to give a count of documents.
    * @param {number} [options.limit] - Set to limit the number of documents
    *   to be returned from a query (min=1, max=1000).
+   * @param {string} [options.cursor] - An opaque pagination cursor from a
+   *   previous page's result, passed back verbatim to resume after that page.
    * @param {object} options.transport - The Transport instance to use.
    *
    * @returns {Promise<object>} - Resolves to the matching documents:
-   *   {documents: [...]}.
+   *   {documents: [...]}. When the server paginates, the result also includes
+   *   `hasMore` (whether more results remain) and, if provided, an opaque
+   *   `cursor` to pass back in a subsequent `find` to fetch the next page.
    */
   async find({
     keyAgreementKey = this.keyAgreementKey,
@@ -600,6 +605,7 @@ export class EdvClientCore {
     returnDocuments,
     count = false,
     limit,
+    cursor,
     transport
   }: IFindOptions = {}) {
     assertTransport(transport)
@@ -625,6 +631,10 @@ export class EdvClientCore {
       query.limit = limit
     }
 
+    if (cursor !== undefined) {
+      query.cursor = cursor
+    }
+
     // find results
     const result = await transport.find({ query })
 
@@ -647,6 +657,9 @@ export class EdvClientCore {
     }
     if (hasMore !== undefined) {
       rval.hasMore = hasMore
+    }
+    if (result.cursor !== undefined) {
+      rval.cursor = result.cursor
     }
     return rval
   }
