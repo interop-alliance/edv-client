@@ -1,10 +1,21 @@
 # @interop/edv-client ChangeLog
 
+## 17.6.0 - TBD
+
+### Added
+
+- `EdvClientCore.find()` now accepts a `cursor` option and surfaces the server's
+  pagination `cursor` in its result, enabling native cursor pagination. Callers
+  can pass the `cursor` from one page's result back into the next `find()` to
+  fetch subsequent pages, instead of bypassing the client and calling the
+  transport directly.
+
 ## 17.5.0 - 2026-07-04
 
 ### Changed
 
-- Update to latest `@interop/minimal-cipher@7.5.0` (adds AES-KW support for React Native).
+- Update to latest `@interop/minimal-cipher@7.5.0` (adds AES-KW support for
+  React Native).
 
 ## 17.4.0 - 2026-07-01
 
