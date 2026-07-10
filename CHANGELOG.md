@@ -1,13 +1,13 @@
 # @interop/edv-client ChangeLog
 
-## 17.6.0 - TBD
+## 17.6.0 - 2026-07-10
 
 ### Added
 
 - `EdvClientCore.find()` now accepts a `cursor` option and surfaces the server's
   pagination `cursor` in its result, enabling native cursor pagination. Callers
   can pass the `cursor` from one page's result back into the next `find()` to
-  fetch subsequent pages, instead of bypassing the client and calling the
+  fetch later pages, instead of bypassing the client and calling the
   transport directly.
 
 ## 17.5.0 - 2026-07-04
