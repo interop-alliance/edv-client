@@ -21,8 +21,8 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3
       '@interop/minimal-cipher':
-        specifier: ^7.5.1
-        version: 7.5.1
+        specifier: ^7.6.1
+        version: 7.6.1
       '@noble/hashes':
         specifier: ^2.2.0
         version: 2.2.0
@@ -41,7 +41,7 @@ importers:
     devDependencies:
       '@eslint/js':
         specifier: ^10.0.1
-        version: 10.0.1(eslint@10.6.0)
+        version: 10.0.1(eslint@10.7.0)
       '@interop/did-method-key':
         specifier: ^7.3.3
         version: 7.3.3(react-native-get-random-values@2.0.0(react-native@0.86.0(@babel/core@7.29.7)(react@19.2.7)))
@@ -58,8 +58,8 @@ importers:
         specifier: ^9.4.1
         version: 9.4.1(react-native-get-random-values@2.0.0(react-native@0.86.0(@babel/core@7.29.7)(react@19.2.7)))
       '@interop/x25519-key-agreement-key':
-        specifier: ^5.1.2
-        version: 5.1.2
+        specifier: ^5.2.0
+        version: 5.2.0
       '@interop/zcap':
         specifier: ^11.0.4
         version: 11.0.4
@@ -80,10 +80,10 @@ importers:
         version: 6.2.2
       eslint:
         specifier: ^10.4.1
-        version: 10.6.0
+        version: 10.7.0
       eslint-config-prettier:
         specifier: ^10.1.8
-        version: 10.1.8(eslint@10.6.0)
+        version: 10.1.8(eslint@10.7.0)
       globals:
         specifier: ^17.6.0
         version: 17.7.0
@@ -107,7 +107,7 @@ importers:
         version: 5.9.3
       typescript-eslint:
         specifier: ^8.60.1
-        version: 8.63.0(eslint@10.6.0)(typescript@5.9.3)
+        version: 8.63.0(eslint@10.7.0)(typescript@5.9.3)
       uuid:
         specifier: ^14.0.0
         version: 14.0.1
@@ -309,10 +309,6 @@ packages:
       react-native-get-random-values:
         optional: true
 
-  '@interop/data-integrity-core@8.1.0':
-    resolution: {integrity: sha512-85NyTH7UhFtFfgnK0J6d/Y/LIMXY8TzE2rMwkOugfrzbgaxVO6YFTkmaNUqnpM4EolJR1t4FN3Xvu69OgXRf/g==}
-    engines: {node: '>=24.0'}
-
   '@interop/data-integrity-core@8.2.0':
     resolution: {integrity: sha512-T3ObUEH1+cEtKU8d0euDTMNrQiXZc5FZUP/T9sbc+wVo+bSBebnh9tUNLpDnqTGy1d6m/2C0JdrTbLnJNjgJCg==}
     engines: {node: '>=24.0'}
@@ -388,16 +384,16 @@ packages:
     resolution: {integrity: sha512-6c8dnoQNIiL25Q4YovC1a44mREO1lzW3F/lmvdwbAMMbhtGGRoQeqo1H4diwNhBzaxRrUMXrAIwbM26POmI/Yg==}
     engines: {node: '>=24.0'}
 
-  '@interop/minimal-cipher@7.5.1':
-    resolution: {integrity: sha512-2z2Ao5Iq3RU9hOq0X/AUuRY6UayQqFS2MSy3GC/ET66tv55sTbc3gjJ/XADsUNH1XtZt5ecTEyPorNruxB60+g==}
+  '@interop/minimal-cipher@7.6.1':
+    resolution: {integrity: sha512-fgxXARys+2Pr2DMGUiLOnJKpALgStqHWxaD7zBF29pf7IeFllZ/0b22cDdV/MheAvXP7Uula46viFSrapwtRFQ==}
     engines: {node: '>=24.0'}
 
   '@interop/security-document-loader@9.4.1':
     resolution: {integrity: sha512-AilGgeLYER/6SP9jxKp5wCT2SLP1YYhahsRFkCJT8gxf8WiaI53Vz8BpfKuIvwaYa+rIicT9wn/+nWUhc+jWMA==}
     engines: {node: '>=24.0'}
 
-  '@interop/x25519-key-agreement-key@5.1.2':
-    resolution: {integrity: sha512-M6BCgz1kcYn474hGykxBGxm3lNGXQw/F5cfbvMBZ8EHgDqxmUsskCjUtMeGbQz1pDe0gyi6ZD28njv7S5RLeJQ==}
+  '@interop/x25519-key-agreement-key@5.2.0':
+    resolution: {integrity: sha512-e8yYMYnK2Ok0FpAqiTs/rJoIStPZ+0L4mMPh6mkKwyLaEc/yYBg9le89uhgoj4vS5gpjL23yGkfG/WoEESO+9Q==}
     engines: {node: '>=24.0'}
 
   '@interop/zcap@11.0.4':
@@ -1046,8 +1042,8 @@ packages:
     resolution: {integrity: sha512-tD40eHxA35h0PEIZNeIjkHoDR4YjjJp34biM0mDvplBe//mB+IHCqHDGV7pxF+7MklTvighcCPPZC7ynWyjdTA==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  eslint@10.6.0:
-    resolution: {integrity: sha512-6lVbcqSodALYo+4ELD0heG6lFiFxnLMuLkiMi2qV8LMp54N8tE8FT1GMH+ev4Ti00nFjNze2+Su6DsV5OQW3Dg==}
+  eslint@10.7.0:
+    resolution: {integrity: sha512-GVTD7s1vdIl6UYvAfriOPeY1Df8LIZjfofLvHwde+erDHGGuHyuM6xoxRxmHiebhYuD2p1vN4wWh0XzPARSGDQ==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
     hasBin: true
     peerDependencies:
@@ -1229,8 +1225,8 @@ packages:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
 
-  ignore@7.0.5:
-    resolution: {integrity: sha512-Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg==}
+  ignore@7.0.6:
+    resolution: {integrity: sha512-BAg6QkE8W+TuQLrrw0Ugr7HegXduRuuj8/ti2kSOc+jz1dmx8/WNcjr6XGnq5YpDWxFwwaavqD0+jIUOKelTsw==}
     engines: {node: '>= 4'}
 
   image-size@1.2.1:
@@ -1830,8 +1826,8 @@ packages:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
 
-  shell-quote@1.9.0:
-    resolution: {integrity: sha512-Iov+JwFv/2HcTpcwNMKd8+IWNb8tboQJNQTkAY/LLVK7gGH9jy+LGkVqPxfekHl+yMmiqXszdGWXgkfml7hjqA==}
+  shell-quote@1.10.0:
+    resolution: {integrity: sha512-w1aiOKwKuRgtwAReIIj89puqg+I7GvX4IbLrvmhXbzQsj1+Zwi4VO3+fa6ZF91TWSjIxoEkKnMeHcLEODK5ZXA==}
     engines: {node: '>= 0.4'}
 
   siginfo@2.0.0:
@@ -2301,9 +2297,9 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@eslint-community/eslint-utils@4.9.1(eslint@10.6.0)':
+  '@eslint-community/eslint-utils@4.9.1(eslint@10.7.0)':
     dependencies:
-      eslint: 10.6.0
+      eslint: 10.7.0
       eslint-visitor-keys: 3.4.3
 
   '@eslint-community/regexpp@4.12.2': {}
@@ -2324,9 +2320,9 @@ snapshots:
     dependencies:
       '@types/json-schema': 7.0.15
 
-  '@eslint/js@10.0.1(eslint@10.6.0)':
+  '@eslint/js@10.0.1(eslint@10.7.0)':
     optionalDependencies:
-      eslint: 10.6.0
+      eslint: 10.7.0
 
   '@eslint/object-schema@3.0.5': {}
 
@@ -2357,26 +2353,24 @@ snapshots:
     optionalDependencies:
       react-native-get-random-values: 2.0.0(react-native@0.86.0(@babel/core@7.29.7)(react@19.2.7))
 
-  '@interop/data-integrity-core@8.1.0': {}
-
   '@interop/data-integrity-core@8.2.0': {}
 
   '@interop/data-integrity-proof@3.4.1':
     dependencies:
-      '@interop/data-integrity-core': 8.1.0
+      '@interop/data-integrity-core': 8.2.0
       '@interop/jsonld-signatures': 11.8.2
       '@noble/hashes': 2.2.0
       '@scure/base': 2.2.0
 
   '@interop/did-io@4.0.6':
     dependencies:
-      '@interop/data-integrity-core': 8.1.0
+      '@interop/data-integrity-core': 8.2.0
       '@interop/lru-memoize': 4.0.3
 
   '@interop/did-method-key@7.3.3(react-native-get-random-values@2.0.0(react-native@0.86.0(@babel/core@7.29.7)(react@19.2.7)))':
     dependencies:
       '@digitalbazaar/x25519-key-agreement-key-2020': 3.0.1
-      '@interop/data-integrity-core': 8.1.0
+      '@interop/data-integrity-core': 8.2.0
       '@interop/did-io': 4.0.6
       '@interop/ed25519-verification-key': 8.0.2(react-native-get-random-values@2.0.0(react-native@0.86.0(@babel/core@7.29.7)(react@19.2.7)))
     transitivePeerDependencies:
@@ -2385,7 +2379,7 @@ snapshots:
   '@interop/did-web-resolver@6.2.3(react-native-get-random-values@2.0.0(react-native@0.86.0(@babel/core@7.29.7)(react@19.2.7)))':
     dependencies:
       '@interop/bnid': 6.0.2(react-native-get-random-values@2.0.0(react-native@0.86.0(@babel/core@7.29.7)(react@19.2.7)))
-      '@interop/data-integrity-core': 8.1.0
+      '@interop/data-integrity-core': 8.2.0
       '@interop/did-io': 4.0.6
       '@interop/http-client': 1.0.4
       did-context: 3.1.1
@@ -2394,12 +2388,12 @@ snapshots:
 
   '@interop/ecdsa-multikey@2.3.2':
     dependencies:
-      '@interop/data-integrity-core': 8.1.0
+      '@interop/data-integrity-core': 8.2.0
       '@scure/base': 2.2.0
 
   '@interop/ed25519-signature@7.1.3(@interop/jsonld-signatures@11.8.2)(react-native-get-random-values@2.0.0(react-native@0.86.0(@babel/core@7.29.7)(react@19.2.7)))':
     dependencies:
-      '@interop/data-integrity-core': 8.1.0
+      '@interop/data-integrity-core': 8.2.0
       '@interop/data-integrity-proof': 3.4.1
       '@interop/ed25519-verification-key': 8.0.2(react-native-get-random-values@2.0.0(react-native@0.86.0(@babel/core@7.29.7)(react@19.2.7)))
       '@interop/jsonld': 9.0.3
@@ -2413,7 +2407,7 @@ snapshots:
 
   '@interop/ed25519-verification-key@8.0.2(react-native-get-random-values@2.0.0(react-native@0.86.0(@babel/core@7.29.7)(react@19.2.7)))':
     dependencies:
-      '@interop/data-integrity-core': 8.1.0
+      '@interop/data-integrity-core': 8.2.0
       '@noble/ed25519': 3.1.0
       '@noble/hashes': 2.2.0
       '@scure/base': 2.2.0
@@ -2431,7 +2425,7 @@ snapshots:
 
   '@interop/http-signature-zcap-invoke@6.2.3':
     dependencies:
-      '@interop/data-integrity-core': 8.1.0
+      '@interop/data-integrity-core': 8.2.0
       '@interop/http-digest-header': 3.0.0
       '@interop/http-signature-header': 5.0.2
       pako: 2.2.0
@@ -2441,7 +2435,7 @@ snapshots:
   '@interop/jsonld-signatures@11.8.2':
     dependencies:
       '@digitalbazaar/security-context': 1.0.1
-      '@interop/data-integrity-core': 8.1.0
+      '@interop/data-integrity-core': 8.2.0
       '@interop/jsonld': 9.0.3
       fast-text-encoding: 1.0.6
       rdf-canonize: 5.0.0
@@ -2458,7 +2452,7 @@ snapshots:
     dependencies:
       lru-cache: 11.5.2
 
-  '@interop/minimal-cipher@7.5.1':
+  '@interop/minimal-cipher@7.6.1':
     dependencies:
       '@interop/data-integrity-core': 8.2.0
       '@interop/ecdsa-multikey': 2.3.2
@@ -2477,7 +2471,7 @@ snapshots:
       '@digitalbazaar/zcap-context': 2.0.1
       '@digitalcredentials/credentials-v2-context': 1.0.0
       '@digitalcredentials/open-badges-context': 3.0.0
-      '@interop/data-integrity-core': 8.1.0
+      '@interop/data-integrity-core': 8.2.0
       '@interop/did-io': 4.0.6
       '@interop/did-method-key': 7.3.3(react-native-get-random-values@2.0.0(react-native@0.86.0(@babel/core@7.29.7)(react@19.2.7)))
       '@interop/did-web-resolver': 6.2.3(react-native-get-random-values@2.0.0(react-native@0.86.0(@babel/core@7.29.7)(react@19.2.7)))
@@ -2495,7 +2489,7 @@ snapshots:
     transitivePeerDependencies:
       - react-native-get-random-values
 
-  '@interop/x25519-key-agreement-key@5.1.2':
+  '@interop/x25519-key-agreement-key@5.2.0':
     dependencies:
       '@interop/data-integrity-core': 8.2.0
       '@noble/curves': 2.2.0
@@ -2504,7 +2498,7 @@ snapshots:
   '@interop/zcap@11.0.4':
     dependencies:
       '@digitalbazaar/zcap-context': 2.0.1
-      '@interop/data-integrity-core': 8.1.0
+      '@interop/data-integrity-core': 8.2.0
       '@interop/jsonld-signatures': 11.8.2
 
   '@isaacs/ttlcache@1.4.1': {}
@@ -2765,30 +2759,30 @@ snapshots:
     dependencies:
       '@types/yargs-parser': 21.0.3
 
-  '@typescript-eslint/eslint-plugin@8.63.0(@typescript-eslint/parser@8.63.0(eslint@10.6.0)(typescript@5.9.3))(eslint@10.6.0)(typescript@5.9.3)':
+  '@typescript-eslint/eslint-plugin@8.63.0(@typescript-eslint/parser@8.63.0(eslint@10.7.0)(typescript@5.9.3))(eslint@10.7.0)(typescript@5.9.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
-      '@typescript-eslint/parser': 8.63.0(eslint@10.6.0)(typescript@5.9.3)
+      '@typescript-eslint/parser': 8.63.0(eslint@10.7.0)(typescript@5.9.3)
       '@typescript-eslint/scope-manager': 8.63.0
-      '@typescript-eslint/type-utils': 8.63.0(eslint@10.6.0)(typescript@5.9.3)
-      '@typescript-eslint/utils': 8.63.0(eslint@10.6.0)(typescript@5.9.3)
+      '@typescript-eslint/type-utils': 8.63.0(eslint@10.7.0)(typescript@5.9.3)
+      '@typescript-eslint/utils': 8.63.0(eslint@10.7.0)(typescript@5.9.3)
       '@typescript-eslint/visitor-keys': 8.63.0
-      eslint: 10.6.0
-      ignore: 7.0.5
+      eslint: 10.7.0
+      ignore: 7.0.6
       natural-compare: 1.4.0
       ts-api-utils: 2.5.0(typescript@5.9.3)
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.63.0(eslint@10.6.0)(typescript@5.9.3)':
+  '@typescript-eslint/parser@8.63.0(eslint@10.7.0)(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/scope-manager': 8.63.0
       '@typescript-eslint/types': 8.63.0
       '@typescript-eslint/typescript-estree': 8.63.0(typescript@5.9.3)
       '@typescript-eslint/visitor-keys': 8.63.0
       debug: 4.4.3
-      eslint: 10.6.0
+      eslint: 10.7.0
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
@@ -2811,13 +2805,13 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  '@typescript-eslint/type-utils@8.63.0(eslint@10.6.0)(typescript@5.9.3)':
+  '@typescript-eslint/type-utils@8.63.0(eslint@10.7.0)(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/types': 8.63.0
       '@typescript-eslint/typescript-estree': 8.63.0(typescript@5.9.3)
-      '@typescript-eslint/utils': 8.63.0(eslint@10.6.0)(typescript@5.9.3)
+      '@typescript-eslint/utils': 8.63.0(eslint@10.7.0)(typescript@5.9.3)
       debug: 4.4.3
-      eslint: 10.6.0
+      eslint: 10.7.0
       ts-api-utils: 2.5.0(typescript@5.9.3)
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -2840,13 +2834,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.63.0(eslint@10.6.0)(typescript@5.9.3)':
+  '@typescript-eslint/utils@8.63.0(eslint@10.7.0)(typescript@5.9.3)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.1(eslint@10.6.0)
+      '@eslint-community/eslint-utils': 4.9.1(eslint@10.7.0)
       '@typescript-eslint/scope-manager': 8.63.0
       '@typescript-eslint/types': 8.63.0
       '@typescript-eslint/typescript-estree': 8.63.0(typescript@5.9.3)
-      eslint: 10.6.0
+      eslint: 10.7.0
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
@@ -3115,9 +3109,9 @@ snapshots:
 
   escape-string-regexp@4.0.0: {}
 
-  eslint-config-prettier@10.1.8(eslint@10.6.0):
+  eslint-config-prettier@10.1.8(eslint@10.7.0):
     dependencies:
-      eslint: 10.6.0
+      eslint: 10.7.0
 
   eslint-scope@9.1.2:
     dependencies:
@@ -3130,9 +3124,9 @@ snapshots:
 
   eslint-visitor-keys@5.0.1: {}
 
-  eslint@10.6.0:
+  eslint@10.7.0:
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.1(eslint@10.6.0)
+      '@eslint-community/eslint-utils': 4.9.1(eslint@10.7.0)
       '@eslint-community/regexpp': 4.12.2
       '@eslint/config-array': 0.23.5
       '@eslint/config-helpers': 0.6.0
@@ -3314,7 +3308,7 @@ snapshots:
 
   ignore@5.3.2: {}
 
-  ignore@7.0.5: {}
+  ignore@7.0.6: {}
 
   image-size@1.2.1:
     dependencies:
@@ -3857,7 +3851,7 @@ snapshots:
 
   react-devtools-core@6.1.5:
     dependencies:
-      shell-quote: 1.9.0
+      shell-quote: 1.10.0
       ws: 7.5.11
     transitivePeerDependencies:
       - bufferutil
@@ -4007,7 +4001,7 @@ snapshots:
 
   shebang-regex@3.0.0: {}
 
-  shell-quote@1.9.0: {}
+  shell-quote@1.10.0: {}
 
   siginfo@2.0.0: {}
 
@@ -4101,13 +4095,13 @@ snapshots:
 
   type-fest@0.7.1: {}
 
-  typescript-eslint@8.63.0(eslint@10.6.0)(typescript@5.9.3):
+  typescript-eslint@8.63.0(eslint@10.7.0)(typescript@5.9.3):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 8.63.0(@typescript-eslint/parser@8.63.0(eslint@10.6.0)(typescript@5.9.3))(eslint@10.6.0)(typescript@5.9.3)
-      '@typescript-eslint/parser': 8.63.0(eslint@10.6.0)(typescript@5.9.3)
+      '@typescript-eslint/eslint-plugin': 8.63.0(@typescript-eslint/parser@8.63.0(eslint@10.7.0)(typescript@5.9.3))(eslint@10.7.0)(typescript@5.9.3)
+      '@typescript-eslint/parser': 8.63.0(eslint@10.7.0)(typescript@5.9.3)
       '@typescript-eslint/typescript-estree': 8.63.0(typescript@5.9.3)
-      '@typescript-eslint/utils': 8.63.0(eslint@10.6.0)(typescript@5.9.3)
-      eslint: 10.6.0
+      '@typescript-eslint/utils': 8.63.0(eslint@10.7.0)(typescript@5.9.3)
+      eslint: 10.7.0
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color

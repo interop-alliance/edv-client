@@ -1,5 +1,11 @@
 # @interop/edv-client ChangeLog
 
+## 17.6.1 -
+
+### Changed
+
+- Update to latest `@interop/minimal-cipher@7.6.1` & `@interop/x25519-key-agreement-key@5.2.0`.
+
 ## 17.6.0 - 2026-07-10
 
 ### Added
