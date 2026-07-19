@@ -1,6 +1,6 @@
 # @interop/edv-client ChangeLog
 
-## 17.7.0 - TBD
+## 17.7.0 - 2026-07-19
 
 ### Added
 
