@@ -18,7 +18,7 @@
  * multibase format.
  */
 import { assert } from './assert.js'
-import { Cipher } from '@interop/minimal-cipher'
+import { Cipher, KeyMissError } from '@interop/minimal-cipher'
 import type {
   IEDVDocument,
   IEncryptedDocument,
@@ -164,7 +164,7 @@ export class EdvDocumentCipher {
       keyAgreementKey: keyAgreementKey as IKeyAgreementKey
     })
     if (data === null) {
-      throw new Error('Decryption failed.')
+      throw new KeyMissError('Decryption failed.')
     }
     const { content, meta, stream } = data
     // append decrypted content, meta, and stream

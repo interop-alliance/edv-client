@@ -2,7 +2,7 @@
  * Copyright (c) 2025 Digital Bazaar, Inc. All rights reserved.
  */
 import { EdvClient, EdvClientCore, EdvDocumentCipher } from '../../src/index.js'
-import { Cipher } from '@interop/minimal-cipher'
+import { Cipher, KeyMissError } from '@interop/minimal-cipher'
 import { assertDocId } from '../../src/assert.js'
 import { IndexHelper } from '../../src/IndexHelper.js'
 import mock from './mock.js'
@@ -46,6 +46,37 @@ describe('EdvDocumentCipher', () => {
       keyAgreementKey
     })
     decrypted.content.should.deep.equal({ secret: 'value' })
+  })
+
+  it('throws KeyMissError when the key does not open the envelope', async () => {
+    const documentCipher = new EdvDocumentCipher({
+      cipher: new Cipher(),
+      indexHelper: new IndexHelper()
+    })
+    const id = await EdvClient.generateId()
+    const recipients = documentCipher.createDefaultRecipients(keyAgreementKey)
+
+    const encrypted = await documentCipher.encrypt({
+      doc: { id, content: { secret: 'value' } },
+      recipients,
+      keyResolver,
+      update: false
+    })
+
+    // decrypting with a key that is not a recipient must fail with a typed
+    // KeyMissError rather than a generic Error
+    let err
+    try {
+      await documentCipher.decrypt({
+        encryptedDoc: encrypted,
+        keyAgreementKey: mock.keys.fips.keyAgreementKey
+      })
+    } catch (caught) {
+      err = caught
+    }
+    should.exist(err)
+    err.should.be.an.instanceof(KeyMissError)
+    err.name.should.equal('KeyMissError')
   })
 
   it('createDefaultRecipients() returns [] without a key', async () => {
