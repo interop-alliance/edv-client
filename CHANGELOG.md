@@ -1,10 +1,26 @@
 # @interop/edv-client ChangeLog
 
+## 17.7.0 - TBD
+
+### Added
+
+- Re-export `assertDocId` from the package entry point, so callers can validate
+  EDV document ids without reaching into `src/assert.js`.
+
+### Changed
+
+- `EdvDocumentCipher.decrypt()` now throws a typed `KeyMissError` (from
+  `@interop/minimal-cipher`) when the supplied key does not open the envelope (a
+  key mismatch), rather than a generic `Error`. This lets callers distinguish a
+  wrong or rotated key from envelope corruption.
+- Update to `@interop/minimal-cipher@7.7.0` (adds the exported `KeyMissError`).
+
 ## 17.6.1 - 2026-07-11
 
 ### Changed
 
-- Update to latest `@interop/minimal-cipher@7.6.1` & `@interop/x25519-key-agreement-key@5.2.0`.
+- Update to latest `@interop/minimal-cipher@7.6.1` &
+  `@interop/x25519-key-agreement-key@5.2.0`.
 
 ## 17.6.0 - 2026-07-10
 
@@ -13,8 +29,8 @@
 - `EdvClientCore.find()` now accepts a `cursor` option and surfaces the server's
   pagination `cursor` in its result, enabling native cursor pagination. Callers
   can pass the `cursor` from one page's result back into the next `find()` to
-  fetch later pages, instead of bypassing the client and calling the
-  transport directly.
+  fetch later pages, instead of bypassing the client and calling the transport
+  directly.
 
 ## 17.5.0 - 2026-07-04
 
