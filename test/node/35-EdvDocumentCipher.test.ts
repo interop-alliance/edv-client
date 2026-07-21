@@ -4,8 +4,14 @@
 import { EdvClient, EdvClientCore, EdvDocumentCipher } from '../../src/index.js'
 import { Cipher, KeyMissError } from '@interop/minimal-cipher'
 import { assertDocId } from '../../src/assert.js'
+import { base64url } from '../../src/baseX.js'
 import { IndexHelper } from '../../src/IndexHelper.js'
 import mock from './mock.js'
+
+function parseProtectedHeader(jwe) {
+  const decoded = new TextDecoder().decode(base64url.decode(jwe.protected))
+  return JSON.parse(decoded)
+}
 
 describe('EdvDocumentCipher', () => {
   let keyAgreementKey = null
@@ -106,6 +112,70 @@ describe('EdvDocumentCipher', () => {
       update: true
     })
     updated.sequence.should.equal(1)
+  })
+
+  it('forwards additionalProtectedParams into the JWE protected header', async () => {
+    const documentCipher = new EdvDocumentCipher({
+      cipher: new Cipher(),
+      indexHelper: new IndexHelper()
+    })
+    const id = await EdvClient.generateId()
+    const recipients = documentCipher.createDefaultRecipients(keyAgreementKey)
+    const was = { v: 1, res: id }
+
+    const encrypted = await documentCipher.encrypt({
+      doc: { id, content: { secret: 'value' } },
+      recipients,
+      keyResolver,
+      update: false,
+      additionalProtectedParams: { was }
+    })
+
+    // the extra members are visible (and AEAD-authenticated) in the header
+    const header = parseProtectedHeader(encrypted.jwe)
+    header.was.should.deep.equal(was)
+    // reserved `enc` remains intact alongside the extra member
+    header.enc.should.be.a('string')
+
+    // the header is the AAD, so a successful decrypt proves it authentic
+    const decrypted = await documentCipher.decrypt({
+      encryptedDoc: encrypted,
+      keyAgreementKey
+    })
+    decrypted.content.should.deep.equal({ secret: 'value' })
+  })
+
+  it('decrypt prefers the sealed stream state over the cleartext copy', async () => {
+    const documentCipher = new EdvDocumentCipher({
+      cipher: new Cipher(),
+      indexHelper: new IndexHelper()
+    })
+    const id = await EdvClient.generateId()
+    const recipients = documentCipher.createDefaultRecipients(keyAgreementKey)
+
+    const encrypted = await documentCipher.encrypt({
+      doc: {
+        id,
+        content: { secret: 'value' },
+        stream: { sequence: 0, chunks: 3 }
+      },
+      recipients,
+      keyResolver,
+      update: false
+    })
+    // the encrypted envelope carries a cleartext `stream` copy
+    encrypted.stream.should.deep.equal({ sequence: 0, chunks: 3 })
+
+    // a malicious server lowers the cleartext chunk count to truncate reads
+    encrypted.stream.chunks = 1
+
+    // after decrypt the authenticated (sealed) count wins over the tampered
+    // cleartext copy
+    const decrypted = await documentCipher.decrypt({
+      encryptedDoc: encrypted,
+      keyAgreementKey
+    })
+    decrypted.stream.chunks.should.equal(3)
   })
 
   it('is exposed as EdvClientCore.documentCipher', async () => {

@@ -51,6 +51,8 @@ export interface IWriteOptions {
   keyResolver?: IKeyResolver
   keyAgreementKey?: IKeyAgreementKey
   hmac?: IHMAC
+  additionalProtectedParams?: Record<string, unknown>
+  chunkedAad?: boolean
   transport?: Transport
 }
 
@@ -188,6 +190,13 @@ export class EdvClientCore {
    *   encryption keys.
    * @param {object} [options.hmac=this.hmac] - An HMAC API for blinding
    *   indexable attributes.
+   * @param {object} [options.additionalProtectedParams] - Extra members merged
+   *   into the document envelope's JWE protected header (the AEAD-authenticated
+   *   AAD); verify them by parsing `jwe.protected` after a successful decrypt.
+   * @param {boolean} [options.chunkedAad=true] - When a `stream` is given, bind
+   *   each stream chunk to its 0-based index in the AEAD AAD so that reordering,
+   *   substituting, or dropping a chunk fails the read. Readers must be upgraded
+   *   before writers; pass `false` to emit the legacy chunk format.
    * @param {object} options.transport - The Transport instance to use.
    *
    * @returns {Promise<object>} - Resolves to the inserted document.
@@ -200,6 +209,8 @@ export class EdvClientCore {
     keyResolver = this.keyResolver,
     keyAgreementKey = this.keyAgreementKey,
     hmac = this.hmac,
+    additionalProtectedParams,
+    chunkedAad,
     transport
   }: IWriteOptions = {}) {
     assertDocument(doc)
@@ -229,7 +240,8 @@ export class EdvClientCore {
       recipients,
       keyResolver,
       hmac,
-      update: false
+      update: false,
+      additionalProtectedParams
     })
 
     // send encrypted doc to EDV server
@@ -252,6 +264,8 @@ export class EdvClientCore {
         recipients: recipients.slice(),
         keyResolver,
         keyAgreementKey,
+        additionalProtectedParams,
+        chunkedAad,
         transport
       })
     }
@@ -282,6 +296,13 @@ export class EdvClientCore {
    *   encryption keys.
    * @param {object} [options.hmac=this.hmac] - An HMAC API for blinding
    *   indexable attributes.
+   * @param {object} [options.additionalProtectedParams] - Extra members merged
+   *   into the document envelope's JWE protected header (the AEAD-authenticated
+   *   AAD); verify them by parsing `jwe.protected` after a successful decrypt.
+   * @param {boolean} [options.chunkedAad=true] - When a `stream` is given, bind
+   *   each stream chunk to its 0-based index in the AEAD AAD so that reordering,
+   *   substituting, or dropping a chunk fails the read. Readers must be upgraded
+   *   before writers; pass `false` to emit the legacy chunk format.
    * @param {object} options.transport - The Transport instance to use.
    *
    * @returns {Promise<object>} - Resolves to the updated document.
@@ -294,6 +315,8 @@ export class EdvClientCore {
     keyResolver = this.keyResolver,
     keyAgreementKey = this.keyAgreementKey,
     hmac = this.hmac,
+    additionalProtectedParams,
+    chunkedAad,
     transport
   }: IWriteOptions = {}) {
     assertDocument(doc, { requireId: true })
@@ -318,7 +341,8 @@ export class EdvClientCore {
       recipients,
       keyResolver,
       hmac,
-      update: true
+      update: true,
+      additionalProtectedParams
     })
 
     // send encrypted doc to EDV server
@@ -342,6 +366,8 @@ export class EdvClientCore {
         keyResolver,
         keyAgreementKey,
         hmac,
+        additionalProtectedParams,
+        chunkedAad,
         transport
       })
     }
@@ -493,6 +519,11 @@ export class EdvClientCore {
 
     const { cipher } = this
     const { id: docId } = doc
+    // `doc.stream` is the caller's document, typically the decrypted result of
+    // `get()`. For documents written by a current writer, `decrypt` surfaces the
+    // AEAD-authenticated `stream` state sealed inside the JWE payload, so this
+    // `chunks` count is authenticated; a server cannot silently truncate a read
+    // by lowering the cleartext envelope copy.
     const state = doc.stream
     assert(state.chunks, 'doc.stream.chunks', 'number')
     let chunkIndex = 0
@@ -739,13 +770,19 @@ export class EdvClientCore {
     keyResolver,
     keyAgreementKey,
     hmac,
+    additionalProtectedParams,
+    // default to per-chunk AAD binding; the reader auto-detects it via the
+    // header flag, so writers must not enable it before readers can decode it
+    chunkedAad = true,
     transport
   }: any) {
     const { cipher } = this
     const encryptStream = await cipher.createEncryptStream({
       recipients,
       keyResolver,
-      chunkSize
+      chunkSize,
+      additionalProtectedParams,
+      chunkedAad
     })
 
     // // TODO: tee `stream` to digest stream as well
@@ -796,6 +833,7 @@ export class EdvClientCore {
       keyResolver,
       keyAgreementKey,
       hmac,
+      additionalProtectedParams,
       transport
     })
   }

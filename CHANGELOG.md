@@ -1,5 +1,34 @@
 # @interop/edv-client ChangeLog
 
+## Unreleased - TBD
+
+### Added
+
+- `EdvDocumentCipher.encrypt()` accepts an optional `additionalProtectedParams`
+  object and forwards it to the JWE cipher, merging those members into the
+  envelope's AEAD-authenticated protected header. Callers verify them by parsing
+  `jwe.protected` after a successful decrypt.
+- `EdvClientCore.insert()` / `update()` (and `EdvClient` /
+  `EdvDocument.write()`) accept the same optional `additionalProtectedParams`,
+  forwarded to the document encrypt, plus an optional `chunkedAad` flag for the
+  stream write path.
+
+### Changed
+
+- Stream writes now bind each chunk to its 0-based index in the AEAD AAD by
+  default (`chunkedAad: true`), so a server that reorders, substitutes, or drops
+  a chunk within a stream is detected on read. The reader auto-detects this via
+  a per-stream header flag, so **readers must be upgraded before writers**.
+  Passing `chunkedAad: false` restores the legacy chunk format for compatibility
+  with older readers.
+- `EdvDocumentCipher.decrypt()` now surfaces the `stream` state sealed inside
+  the (AEAD-authenticated) JWE payload in preference to the cleartext copy
+  carried on the envelope, falling back to the cleartext copy only for legacy
+  documents whose payload has none. This prevents a server from silently
+  truncating a stream read by lowering the cleartext chunk count;
+  `getStream()`'s chunk count is therefore authenticated for documents written
+  by a current writer.
+
 ## 17.7.0 - 2026-07-19
 
 ### Added

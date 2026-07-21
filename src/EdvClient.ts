@@ -38,6 +38,8 @@ export interface IClientWriteOptions extends IZcapAuthOptions {
   keyResolver?: IKeyResolver
   keyAgreementKey?: IKeyAgreementKey
   hmac?: IHMAC
+  additionalProtectedParams?: Record<string, unknown>
+  chunkedAad?: boolean
 }
 
 /**
@@ -313,6 +315,8 @@ export class EdvClient extends EdvClientCore {
     keyResolver = this.keyResolver,
     keyAgreementKey = this.keyAgreementKey,
     hmac = this.hmac,
+    additionalProtectedParams,
+    chunkedAad,
     capability = this.capability,
     invocationSigner = this.invocationSigner
   }: IClientWriteOptions = {}) {
@@ -326,6 +330,8 @@ export class EdvClient extends EdvClientCore {
       keyResolver,
       keyAgreementKey,
       hmac,
+      additionalProtectedParams,
+      chunkedAad,
       transport
     })
   }
@@ -366,6 +372,8 @@ export class EdvClient extends EdvClientCore {
     keyResolver = this.keyResolver,
     keyAgreementKey = this.keyAgreementKey,
     hmac = this.hmac,
+    additionalProtectedParams,
+    chunkedAad,
     capability = this.capability,
     invocationSigner = this.invocationSigner
   }: IClientWriteOptions = {}) {
@@ -379,6 +387,8 @@ export class EdvClient extends EdvClientCore {
       keyResolver,
       keyAgreementKey,
       hmac,
+      additionalProtectedParams,
+      chunkedAad,
       transport
     })
   }

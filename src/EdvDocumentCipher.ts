@@ -167,8 +167,15 @@ export class EdvDocumentCipher {
       throw new KeyMissError('Decryption failed.')
     }
     const { content, meta, stream } = data
-    // append decrypted content, meta, and stream
+    // append decrypted content and meta
     const doc: IEDVDocument = { ...encryptedDoc, content, meta }
+    // Prefer the `stream` state sealed inside the JWE payload (AEAD-
+    // authenticated) over the cleartext copy carried on the envelope: a
+    // malicious server can lower `encryptedDoc.stream.chunks` to truncate a
+    // read, but cannot forge the authenticated copy. The spread above already
+    // pulled in the cleartext copy, so only override it when the decrypted
+    // payload actually carries one; legacy documents whose payload has no
+    // `stream` fall back to that cleartext copy.
     if (stream !== undefined) {
       doc.stream = stream
     }
@@ -191,6 +198,11 @@ export class EdvDocumentCipher {
    *   when absent, indexing is skipped
    * @param [options.update] {boolean}              `true` to advance `sequence`
    *   (an existing document), `false` for a fresh insert
+   * @param [options.additionalProtectedParams] {Record<string, unknown>}   extra
+   *   members merged into the JWE protected header (the AEAD-authenticated AAD);
+   *   forwarded to `cipher.encryptObject`. Callers verify these by parsing
+   *   `jwe.protected` after a successful decrypt. The reserved `enc` and `caad`
+   *   members must not be set here.
    * @returns {Promise<IEncryptedDocument>}
    */
   async encrypt({
@@ -198,13 +210,15 @@ export class EdvDocumentCipher {
     recipients,
     keyResolver,
     hmac,
-    update
+    update,
+    additionalProtectedParams
   }: {
     doc: IEDVDocument
     recipients?: IRecipientTemplate[]
     keyResolver?: IKeyResolver
     hmac?: IHMAC
     update?: boolean
+    additionalProtectedParams?: Record<string, unknown>
   }): Promise<IEncryptedDocument> {
     const encrypted: any = { ...doc }
     if (!encrypted.meta) {
@@ -277,7 +291,8 @@ export class EdvDocumentCipher {
       cipher.encryptObject({
         obj,
         recipients: recipients as IRecipientTemplate[],
-        keyResolver: keyResolver as IKeyResolver
+        keyResolver: keyResolver as IKeyResolver,
+        additionalProtectedParams
       })
     ])
     delete encrypted.content
