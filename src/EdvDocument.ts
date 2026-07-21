@@ -125,7 +125,9 @@ export class EdvDocument {
     stream,
     chunkSize,
     recipients = this.recipients,
-    keyResolver = this.keyResolver
+    keyResolver = this.keyResolver,
+    additionalProtectedParams,
+    chunkedAad
   }: any) {
     const { keyAgreementKey, hmac, capability, invocationSigner, client } = this
     return client.update({
@@ -136,6 +138,8 @@ export class EdvDocument {
       keyResolver,
       keyAgreementKey,
       hmac,
+      additionalProtectedParams,
+      chunkedAad,
       capability,
       invocationSigner
     })
