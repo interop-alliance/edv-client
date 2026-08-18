@@ -1,2 +1,2 @@
 minimumReleaseAgeExclude:
-  - '@interop/minimal-cipher@7.8.0'
+  - '@interop/*'

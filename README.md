@@ -257,7 +257,10 @@ See the API section below.
 
 ## Contribute
 
-Please follow the existing code style.
+Please follow the existing code style. See [CONTRIBUTING.md](CONTRIBUTING.md)
+for code style and contribution conventions, and
+[ARCHITECTURE.md](ARCHITECTURE.md) for the module map and EDV server protocol
+contract.
 
 PRs accepted.
 
