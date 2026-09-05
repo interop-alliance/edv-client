@@ -1,6 +1,6 @@
 # @interop/edv-client ChangeLog
 
-## 17.8.2 - TBD
+## 17.8.2 - 2026-09-05
 
 ### Changed
 - Update to latest key deps.
