@@ -1,13 +1,21 @@
 # @interop/edv-client ChangeLog
 
+## 17.8.3 - TBD
+
+### Changed
+
+- Use `X25519KeyAgreementKey2020.fromEd25519` for conversion.
+
 ## 17.8.2 - 2026-09-05
 
 ### Changed
+
 - Update to latest key deps.
 
 ## 17.8.1 - 2026-08-18
 
 ### Changed
+
 - Update to latest `@interop/data-integrity-core@8.7.1`.
 
 ## 17.8.0 - 2026-07-21

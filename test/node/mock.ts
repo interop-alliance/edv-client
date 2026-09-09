@@ -150,9 +150,7 @@ export class TestMock {
     // get matching key agreement key pair
     const keyAgreementPublicKey = methodFor({ purpose: 'keyAgreement' })
     const keyAgreementPair =
-      X25519KeyAgreementKey2020.fromEd25519VerificationKey2020({
-        keyPair: verificationKeyPair
-      })
+      X25519KeyAgreementKey2020.fromEd25519(verificationKeyPair)
     keyAgreementPair.id = keyAgreementPublicKey.id
     keyAgreementPair.controller = keyAgreementPublicKey.controller
     this.keyStorage.set(

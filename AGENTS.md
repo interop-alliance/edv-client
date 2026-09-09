@@ -18,15 +18,15 @@ changes.
 
 ### Reference materials
 
-| Resource                                                            | Location                                                      |
-| ------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Resource                                                            | Location                                                                                                 |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | EDV spec                                                            | <https://identity.foundation/edv-spec/> (terminology: <https://identity.foundation/edv-spec/terms.html>) |
-| WAS spec                                                            | <https://github.com/w3c-ccg/wallet-attached-storage-spec/blob/main/spec.md>  |
-| WAS client                                                          | <https://github.com/interop-alliance/was-client>              |
-| zCap Developer Guide                                                | <https://github.com/interop-alliance/zcap-developer-guide/blob/main/README.md> |
-| ezcap fork (zcap client; its AGENTS.md also defines house TS style) | <https://github.com/interop-alliance/ezcap>                   |
-| Current @interop zcap server-side verification pattern              | <https://github.com/interop-alliance/was-teaching-server/blob/main/src/zcap.ts> |
-| EDV server (Digital Bazaar implementation) annotated with types     | <https://github.com/interop-alliance/bedrock-edv-storage> (see its AGENTS.md) |
+| WAS spec                                                            | <https://github.com/w3c-ccg/wallet-attached-storage-spec/blob/main/spec.md>                              |
+| WAS client                                                          | <https://github.com/interop-alliance/was-client>                                                         |
+| zCap Developer Guide                                                | <https://github.com/interop-alliance/zcap-developer-guide/blob/main/README.md>                           |
+| ezcap fork (zcap client; its AGENTS.md also defines house TS style) | <https://github.com/interop-alliance/ezcap>                                                              |
+| Current @interop zcap server-side verification pattern              | <https://github.com/interop-alliance/was-teaching-server/blob/main/src/zcap.ts>                          |
+| EDV server (Digital Bazaar implementation) annotated with types     | <https://github.com/interop-alliance/bedrock-edv-storage> (see its AGENTS.md)                            |
 
 ## Server Protocol Contract
 
