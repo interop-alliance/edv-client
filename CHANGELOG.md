@@ -1,6 +1,6 @@
 # @interop/edv-client ChangeLog
 
-## 17.8.4 - TBD
+## 17.8.4 - 2026-09-10
 
 - Update to latest ed25519 key dep (`didKeySigner()`).
 
