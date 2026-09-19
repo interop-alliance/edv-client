@@ -1,5 +1,16 @@
 # @interop/edv-client ChangeLog
 
+## 17.9.0 - TBD
+
+### Added
+
+- A `./core` entry point carrying `EdvClientCore`, `EdvDocumentCipher`,
+  `assertDocId` and the abstract `Transport`, without `EdvClient`, `EdvDocument`
+  or `HttpsTransport`. Its import graph reaches neither `@interop/http-client`
+  nor `@interop/http-signature-zcap-invoke`, so a caller that supplies its own
+  transport, or that decrypts with no server at all, can keep the HTTP packages
+  out of its graph. The root entry is unchanged and still exports all seven.
+
 ## 17.8.4 - 2026-09-10
 
 - Update to latest ed25519 key dep (`didKeySigner()`).

@@ -9,8 +9,10 @@ for agent-facing rules (toolchain, tests, reference paths) see
 
 ```
 src/
-  index.ts          Public API: EdvClient, EdvDocument, EdvClientCore,
-                    EdvDocumentCipher, HttpsTransport, Transport
+  index.ts          Public API: EdvClient, EdvDocument, HttpsTransport, plus
+                    everything core.ts exports
+  core.ts           The `./core` entry: EdvClientCore, EdvDocumentCipher,
+                    assertDocId, Transport -- no HTTP packages in its graph
   EdvClientCore.ts  Transport-agnostic core: index updates, sequence handling,
                     tombstone delete; owns an EdvDocumentCipher (documentCipher)
   EdvDocumentCipher.ts  Transport-free JWE codec: encrypt/decrypt, default

@@ -61,6 +61,22 @@ pnpm run test:node     # vitest (Node)
 pnpm run test:browser  # playwright (browser smoke test)
 ```
 
+### Entry points
+
+The package publishes two:
+
+- `@interop/edv-client` -- everything: `EdvClient`, `EdvDocument`,
+  `HttpsTransport`, plus the core entry's exports.
+- `@interop/edv-client/core` -- `EdvClientCore`, `EdvDocumentCipher`,
+  `assertDocId` and the abstract `Transport`, and nothing that talks HTTP.
+  Nothing reachable from it imports `@interop/http-client` or
+  `@interop/http-signature-zcap-invoke`. Import from here when you bring your
+  own `Transport` subclass, or when you only encrypt and decrypt locally.
+
+```js
+import { EdvClientCore, Transport } from '@interop/edv-client/core'
+```
+
 ### React Native
 
 This library is isomorphic and runs on React Native, with one environment
