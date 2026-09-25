@@ -1,5 +1,11 @@
 # @interop/edv-client ChangeLog
 
+## 17.9.1 - TBD
+
+### Changed
+
+- Update to latest `@interop/data-integrity-core@8.8.0`.
+
 ## 17.9.0 - 2026-09-18
 
 ### Added
