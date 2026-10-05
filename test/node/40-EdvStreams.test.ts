@@ -1,7 +1,12 @@
 /*!
  * Copyright (c) 2018-2023 Digital Bazaar, Inc. All rights reserved.
  */
-import { EdvClient, EdvDocument } from '../../src/index.js'
+import {
+  EdvClient,
+  EdvClientCore,
+  EdvDocument,
+  Transport
+} from '../../src/index.js'
 import { isNewEDV, isRecipient } from './test-utils.js'
 import { base64url } from '../../src/baseX.js'
 import mock from './mock.js'
@@ -403,5 +408,53 @@ describe('EDV Stream Tests', function () {
       )
       roundTripped.should.deep.equal(data)
     })
+  })
+})
+
+describe('chunked-stream write failure', () => {
+  beforeAll(async () => {
+    await mock.init()
+  })
+  afterAll(async () => {
+    await mock.server.shutdown()
+  })
+
+  it('cancels the caller stream when a chunk write fails', async () => {
+    const client = await mock.createEdv({})
+    // A transport that stores the document but refuses the second chunk.
+    class TearingTransport extends Transport {
+      stored = 0
+      async insert() {}
+      async storeChunk() {
+        if (this.stored++ === 1) {
+          throw new Error('chunk store refused')
+        }
+      }
+    }
+    let cancelled: unknown = undefined
+    const source = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        controller.enqueue(getRandomUint8({ size: 64 }))
+      },
+      cancel(reason) {
+        cancelled = reason
+      }
+    })
+    let failure: unknown = undefined
+    try {
+      await EdvClientCore.prototype.insert.call(client, {
+        keyResolver: mock.keyResolver,
+        doc: { id: await EdvClient.generateId(), content: {} },
+        stream: source,
+        chunkSize: 64,
+        transport: new TearingTransport()
+      })
+    } catch (err) {
+      failure = err
+    }
+    should.exist(failure)
+    ;(failure as Error).message.should.equal('chunk store refused')
+    should.exist(cancelled)
+    ;(cancelled as Error).message.should.equal('chunk store refused')
   })
 })

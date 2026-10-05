@@ -799,23 +799,34 @@ export class EdvClientCore {
     let value
     let done
     let chunks = 0
-    while (!done) {
-      // read next encrypted chunk
-      ;({ value, done } = await reader.read())
-      if (!value) {
-        break
-      }
+    try {
+      while (!done) {
+        // read next encrypted chunk
+        ;({ value, done } = await reader.read())
+        if (!value) {
+          break
+        }
 
-      // create chunk
-      chunks++
-      const chunk = {
-        sequence: doc.sequence,
-        ...value
-      }
+        // create chunk
+        chunks++
+        const chunk = {
+          sequence: doc.sequence,
+          ...value
+        }
 
-      // TODO: in theory could do encryption and sending in parallel, they
-      // are safely independent operations, consider this optimization
-      await transport.storeChunk({ docId, chunk })
+        // TODO: in theory could do encryption and sending in parallel, they
+        // are safely independent operations, consider this optimization
+        await transport.storeChunk({ docId, chunk })
+      }
+    } catch (err) {
+      // A chunk write failed partway. Cancelling the encrypt stream's readable
+      // side errors its writable side, and the pipe then cancels the caller's
+      // `stream` with the same reason, releasing whatever is behind it (a file
+      // handle, a response body). Without this the caller's stream stays
+      // locked by the pipe and can never be cancelled. Best effort: the write
+      // failure is the error to report, not a source that already errored.
+      await reader.cancel(err).catch(() => {})
+      throw err
     }
 
     // TODO: await digest from tee'd stream

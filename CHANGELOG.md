@@ -1,5 +1,15 @@
 # @interop/edv-client ChangeLog
 
+## 17.9.2 - TBD
+
+### Fixed
+
+- A chunked stream write (`insert` / `update` with a `stream`) that fails
+  partway now cancels the caller's source stream with the failure as the
+  reason. Before, the pipe into the encrypt stream was abandoned, leaving the
+  source locked and never cancelled, so a file handle or response body behind
+  it was never released.
+
 ## 17.9.1 - 2026-09-25
 
 ### Changed
