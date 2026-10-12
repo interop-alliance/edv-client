@@ -1,5 +1,11 @@
 # @interop/edv-client ChangeLog
 
+## 17.9.3 - TBD
+
+### Changed
+
+- Update to latest jsigs and di core.
+
 ## 17.9.2 - 2026-10-05
 
 ### Fixed
