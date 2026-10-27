@@ -1,5 +1,11 @@
 # @interop/edv-client ChangeLog
 
+## 17.9.4 - TBD
+
+### Changed
+
+- Update to latest minimal-cipher.
+
 ## 17.9.3 - 2026-10-12
 
 ### Changed

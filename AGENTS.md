@@ -8,7 +8,7 @@ the server never sees, and talks to an EDV server over zcap-authorized HTTP. It
 is the Interop Alliance TypeScript fork of Digital Bazaar's `edv-client`. The
 reference server implementation is `@bedrock/edv-storage` (see its AGENTS.md,
 linked below, for the server-side architecture and the planned TypeScript +
-fastify port for Wallet Attached Storage); that server's `test/mocha/25-28*`
+fastify port for Portable Web Spaces, formerly Wallet Attached Storage); that server's `test/mocha/25-28*`
 suites drive this client end to end, so the two must stay wire-compatible.
 Shared types (`IEDVConfig`, `IEncryptedDocument`, `IEDVChunk`, `IEDVQuery`) come
 from `@interop/data-integrity-core`.
@@ -21,7 +21,7 @@ changes.
 | Resource                                                            | Location                                                                                                 |
 | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | EDV spec                                                            | <https://identity.foundation/edv-spec/> (terminology: <https://identity.foundation/edv-spec/terms.html>) |
-| WAS spec                                                            | <https://github.com/w3c-ccg/wallet-attached-storage-spec/blob/main/spec.md>                              |
+| PWS spec (formerly WAS)                                             | <https://github.com/w3c-ccg/portable-web-spaces-spec/blob/main/spec.md>                              |
 | WAS client                                                          | <https://github.com/interop-alliance/was-client>                                                         |
 | zCap Developer Guide                                                | <https://github.com/interop-alliance/zcap-developer-guide/blob/main/README.md>                           |
 | ezcap fork (zcap client; its AGENTS.md also defines house TS style) | <https://github.com/interop-alliance/ezcap>                                                              |

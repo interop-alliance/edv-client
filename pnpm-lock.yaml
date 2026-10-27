@@ -21,8 +21,8 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3
       '@interop/minimal-cipher':
-        specifier: ^7.11.0
-        version: 7.11.0
+        specifier: ^7.11.1
+        version: 7.11.1
       '@noble/hashes':
         specifier: ^2.2.0
         version: 2.4.0
@@ -55,14 +55,14 @@ importers:
         specifier: ^8.2.2
         version: 8.2.2(react-native-get-random-values@2.0.0(react-native@0.87.1(@babel/core@7.29.7)(react@19.3.0)))
       '@interop/security-document-loader':
-        specifier: ^10.1.5
-        version: 10.1.5(react-native-get-random-values@2.0.0(react-native@0.87.1(@babel/core@7.29.7)(react@19.3.0)))
+        specifier: ^10.1.6
+        version: 10.1.6(react-native-get-random-values@2.0.0(react-native@0.87.1(@babel/core@7.29.7)(react@19.3.0)))
       '@interop/x25519-key-agreement-key':
         specifier: ^5.4.3
         version: 5.4.3
       '@interop/zcap':
-        specifier: ^11.3.5
-        version: 11.3.5
+        specifier: ^11.4.0
+        version: 11.4.0
       '@playwright/test':
         specifier: ^1.60.0
         version: 1.64.0
@@ -318,8 +318,8 @@ packages:
     resolution: {integrity: sha512-lqBgjHzSaZCz1GHiiZJkwT0wWXF4nETnm/wIanDVSk+KkP4ziujnG+uSlcpmQEhbk/YoK9I/vQR1xarWE84jYg==}
     engines: {node: '>=24.0'}
 
-  '@interop/did-web-resolver@6.4.0':
-    resolution: {integrity: sha512-hPFZmygpzlWy0zIWZsxnpnidzKhh7fPixrMXZC7efY7yPdVPUGy3emJkPyiqAadorDZjJvCsGoewaNe1kLPdDQ==}
+  '@interop/did-web-resolver@6.5.0':
+    resolution: {integrity: sha512-rK7Y4XBabua8/FeNOos1/mX6nkKLsR95iLPzTldbKoqqXgYj/3xZqy09qbFiX2T1JzcZTb3pm3991+g4xxGjhQ==}
     engines: {node: '>=24.0'}
 
   '@interop/ecdsa-multikey@2.4.2':
@@ -377,20 +377,20 @@ packages:
     resolution: {integrity: sha512-6c8dnoQNIiL25Q4YovC1a44mREO1lzW3F/lmvdwbAMMbhtGGRoQeqo1H4diwNhBzaxRrUMXrAIwbM26POmI/Yg==}
     engines: {node: '>=24.0'}
 
-  '@interop/minimal-cipher@7.11.0':
-    resolution: {integrity: sha512-LkU7/mv6Ixab724cGKE9rXNdQ4GdqnzJyhyaBQjqpJGebx5MroVwSZwFYjF+pdk0aaUAaVLZimi6/oGHdpeltA==}
+  '@interop/minimal-cipher@7.11.1':
+    resolution: {integrity: sha512-2IW190KLOH7GmUqwD7Wg82bc9dC5DYxRpgW5Z+MV87CxsVOu5wRNXr7Bd7Bne0bo3XU04r4lAVq4KB3eJuHbig==}
     engines: {node: '>=24.0'}
 
-  '@interop/security-document-loader@10.1.5':
-    resolution: {integrity: sha512-TtXA+ClYfVPyT9uDPSSil/vNMHnFb6yloNpD9hWGXY6Nf7Bamb7pOS7wCmPAgeAjiIm3cpJM+uRAPs1o2H21OA==}
+  '@interop/security-document-loader@10.1.6':
+    resolution: {integrity: sha512-FMWqpj9KYZw29bAl41RBnRXixoJKPvvs3Jup5LEYzSpKfc6bt8ywkAI8F9zmgFmJNlZyzx9LJWm09sM35d8cRA==}
     engines: {node: '>=24.0'}
 
   '@interop/x25519-key-agreement-key@5.4.3':
     resolution: {integrity: sha512-B9/nkteXhceT1Psy+0Lwg4R4JzW6TUYDe8AgPIc3nsQKOCdIQ4MjjUPy9/kQ7eTnzW+GR0FcTSKDy6/GQqlwdQ==}
     engines: {node: '>=24.0'}
 
-  '@interop/zcap@11.3.5':
-    resolution: {integrity: sha512-7mJm1flEt9QdEmxQ7jKJKIu4uv0cibz6gA2mqFb1Ox2h12Cv2oM6LXbKcc7o06I5kLGFjVx8IgHQLMnu3Fhwrg==}
+  '@interop/zcap@11.4.0':
+    resolution: {integrity: sha512-Hhv0hV2xAlY8BWO5IxADi6w3L9qOdcM37R6ATMoicH1K7JO5vDjd96BwZ4SIkx+JSt6EWJjbO5Aejk4SMzJq/w==}
     engines: {node: '>=24.0'}
 
   '@isaacs/ttlcache@1.4.1':
@@ -2317,7 +2317,7 @@ snapshots:
     transitivePeerDependencies:
       - react-native-get-random-values
 
-  '@interop/did-web-resolver@6.4.0(react-native-get-random-values@2.0.0(react-native@0.87.1(@babel/core@7.29.7)(react@19.3.0)))':
+  '@interop/did-web-resolver@6.5.0(react-native-get-random-values@2.0.0(react-native@0.87.1(@babel/core@7.29.7)(react@19.3.0)))':
     dependencies:
       '@interop/bnid': 6.0.2(react-native-get-random-values@2.0.0(react-native@0.87.1(@babel/core@7.29.7)(react@19.3.0)))
       '@interop/data-integrity-core': 8.9.0
@@ -2395,7 +2395,7 @@ snapshots:
     dependencies:
       lru-cache: 11.5.3
 
-  '@interop/minimal-cipher@7.11.0':
+  '@interop/minimal-cipher@7.11.1':
     dependencies:
       '@interop/data-integrity-core': 8.9.0
       '@interop/ecdsa-multikey': 2.4.2
@@ -2405,7 +2405,7 @@ snapshots:
       '@stablelib/chacha': 2.0.1
       '@stablelib/chacha20poly1305': 2.0.1
 
-  '@interop/security-document-loader@10.1.5(react-native-get-random-values@2.0.0(react-native@0.87.1(@babel/core@7.29.7)(react@19.3.0)))':
+  '@interop/security-document-loader@10.1.6(react-native-get-random-values@2.0.0(react-native@0.87.1(@babel/core@7.29.7)(react@19.3.0)))':
     dependencies:
       '@digitalbazaar/data-integrity-context': 2.0.1
       '@digitalbazaar/multikey-context': 2.0.1
@@ -2417,7 +2417,7 @@ snapshots:
       '@interop/data-integrity-core': 8.9.0
       '@interop/did-io': 4.2.2
       '@interop/did-method-key': 7.5.1(react-native-get-random-values@2.0.0(react-native@0.87.1(@babel/core@7.29.7)(react@19.3.0)))
-      '@interop/did-web-resolver': 6.4.0(react-native-get-random-values@2.0.0(react-native@0.87.1(@babel/core@7.29.7)(react@19.3.0)))
+      '@interop/did-web-resolver': 6.5.0(react-native-get-random-values@2.0.0(react-native@0.87.1(@babel/core@7.29.7)(react@19.3.0)))
       '@interop/ecdsa-multikey': 2.4.2
       '@interop/ed25519-verification-key': 8.2.2(react-native-get-random-values@2.0.0(react-native@0.87.1(@babel/core@7.29.7)(react@19.3.0)))
       '@interop/http-client': 1.0.5
@@ -2438,7 +2438,7 @@ snapshots:
       '@noble/curves': 2.4.0
       '@scure/base': 2.4.0
 
-  '@interop/zcap@11.3.5':
+  '@interop/zcap@11.4.0':
     dependencies:
       '@digitalbazaar/zcap-context': 2.0.1
       '@interop/data-integrity-core': 8.9.0
