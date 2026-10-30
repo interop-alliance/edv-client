@@ -1,5 +1,13 @@
 # @interop/edv-client ChangeLog
 
+## 17.9.5 - TBD
+
+### Fixed
+
+- `canonicalize` is imported dynamically in `IndexHelper` and
+  `LegacyIndexHelperVersion1`. canonicalize 3 is ESM-only with no `default`
+  export condition, so the static import broke CJS-path resolvers such as tsx.
+
 ## 17.9.4 - 2026-10-27
 
 ### Changed

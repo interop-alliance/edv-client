@@ -2,7 +2,6 @@
  * Copyright (c) 2019-2026 Digital Bazaar, Inc. All rights reserved.
  */
 import { base64url } from './baseX.js'
-import canonicalize from 'canonicalize'
 import { sha256 } from './util.js'
 import { IndexHelperBase } from './IndexHelperBase.js'
 
@@ -31,6 +30,8 @@ export class LegacyIndexHelperVersion1 extends IndexHelperBase {
    * @returns {Promise<object>} - Resolves to an object `{name, value}`.
    */
   async _blindAttribute({ hmac, key, value }: any) {
+    // Imported dynamically, for the same reason as `IndexHelper`.
+    const { default: canonicalize } = await import('canonicalize')
     // salt values with key to prevent cross-key leakage
     value = canonicalize({ key: value })
     const [blindedName, blindedValue] = await Promise.all([

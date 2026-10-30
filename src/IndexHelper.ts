@@ -2,7 +2,6 @@
  * Copyright (c) 2019-2026 Digital Bazaar, Inc. All rights reserved.
  */
 import { base64url } from './baseX.js'
-import canonicalize from 'canonicalize'
 import { LruCache } from '@interop/lru-memoize'
 import { sha256 } from './util.js'
 import { assertHmac, IndexHelperBase } from './IndexHelperBase.js'
@@ -222,6 +221,10 @@ export class IndexHelper extends IndexHelperBase {
    * @returns {Promise<object>} - Resolves to an object `{name, value}`.
    */
   async _hashAttribute({ name, value }: any) {
+    // Imported dynamically: canonicalize@3 is ESM-only and its exports map
+    // declares no `default`/`require` condition, so a static import keeps it in
+    // the module graph and breaks CJS-path resolvers (e.g. tsx).
+    const { default: canonicalize } = await import('canonicalize')
     // canonicalize value to get consistent representation and hash
     value = canonicalize(value)
     const [hashedName, hashedValue] = await Promise.all([
